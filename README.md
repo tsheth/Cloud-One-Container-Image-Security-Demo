@@ -12,7 +12,7 @@ Spin up test environment in order to trial Trend Micro's Smart Check product. Th
 2. Set up your [AWS profile](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-profiles.html).
 3. Create an [EC2 key](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-key-pairs.html) and download it to your machine.
 4. Install [Docker](https://docs.docker.com/install/linux/docker-ce/ubuntu/).
-5. Install [kubectl](lhttps://kubernetes.io/docs/tasks/tools/install-kubectl/).
+5. Install [kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl/).
 6. Install [Helm](https://helm.sh/docs/using_helm/#installing-helm).
 6. Fill in `vars.json`.
 
@@ -25,13 +25,14 @@ Spin up test environment in order to trial Trend Micro's Smart Check product. Th
 
 2. Start demo: 
 	```
-	make start-demo EC2_KEY_PATH=</path/to/EC2/key> ACTIVATION_CODE=<activation_code> STACK_NAME=<stack_name> REGION=<was_region> PASSWORD=<password>
+	make start-demo EC2_KEY_PATH=</path/to/EC2/key> REGISTRY_NAME=<registry_name> ACTIVATION_CODE=<activation_code> STACK_NAME=<stack_name> REGION=<aws_region> PASSWORD=<password>
 	```
 
 	* Mandatory argument: 
 		* `EC2_KEY_PATH`
 	* Optional arguments: 
 		* `STACK_NAME` - Default: `SmartCheckDemo`
+		* `REGISTRY_NAME` - Default: `smart-check-demo`
 		* `REGION` - Default: `ap-southeast-2`
 		* `PASSWORD` - Default: `password`
 		* `ACTIVATION_CODE` - Default: `<NONE>`
@@ -40,19 +41,21 @@ Spin up test environment in order to trial Trend Micro's Smart Check product. Th
 	1. Browse to the provided Smart Check URI.
 	2. Authenticate with the provided username and password.
 	3. Set a registry name and description.
-	5. Set "Region" to "ap-southeast-2", unless you specified a different region when running `make`.
-	6. Input the provided ECR Registry ID.
-	7. Set "Authentication Mode" to "Instance Role".
-	8. Click "Next" to get started.
+	5. Set `Region` to `ap-southeast-2`, unless you specified a different region when running `make`.
+	6. Input the provided ECR `Registry ID`.
+	7. Set `Authentication Mode` to `Instance Role`.
+	8. Click **Next** to get started.
 
 4. When you're done, stop the demo:
 	```
 	make stop-demo
 	```
 
-**Note**: Sometimes the CloudFormation template fails to remove all resources. If this occurs, you'll need to manually delete the Load Balancer and VPC created by the demo.
+**Note 1**: The Load Balancer can take a few minutes to intialise. If you cannot access the Smart Check URI after the script finishes running, continue refreshing your browser. 
 
-## Example Output
+**Note 2**: Sometimes the CloudFormation template fails to remove all resources. If this occurs, you'll need to manually delete the Load Balancer and VPC created by the demo.
+
+## Example
 
 ```
 $ make start-demo EC2_KEY_PATH=~/.ssh/DemoKey STACK_NAME=SmartCheckDemo2
