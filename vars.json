@@ -1,0 +1,14 @@
+[
+  {
+    "ParameterKey": "AvailabilityZone",
+    "ParameterValue": "ap-southeast-2a"
+  },
+  {
+    "ParameterKey": "KeyName",
+    "ParameterValue": "<KEY_NAME>"
+  },
+  {
+    "ParameterKey": "AdminIngressLocation",
+    "ParameterValue": "0.0.0.0/0"
+  }
+]
