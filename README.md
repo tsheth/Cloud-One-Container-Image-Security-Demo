@@ -12,8 +12,8 @@ Spin up test environment in order to trial Trend Micro's Smart Check product. Th
 2. Set up your [AWS profile](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-profiles.html).
 3. Create an [EC2 key](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-key-pairs.html) and download it to your machine.
 4. Install [Docker](https://docs.docker.com/install/linux/docker-ce/ubuntu/).
-5. Install [kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl/).
-6. Install [Helm](https://helm.sh/docs/using_helm/#installing-helm).
+5. Install [kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl/) - `sudo snap install kubectl --classic`
+6. Install [Helm](https://helm.sh/docs/using_helm/#installing-helm) - `sudo snap install helm --classic`
 
 ## Demo
 1. Set `AWS_PROFILE`:
