@@ -14,7 +14,6 @@ Spin up test environment in order to trial Trend Micro's Smart Check product. Th
 4. Install [Docker](https://docs.docker.com/install/linux/docker-ce/ubuntu/).
 5. Install [kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl/).
 6. Install [Helm](https://helm.sh/docs/using_helm/#installing-helm).
-6. Fill in `vars.json`.
 
 ## Demo
 1. Set `AWS_PROFILE`:
@@ -23,7 +22,9 @@ Spin up test environment in order to trial Trend Micro's Smart Check product. Th
 	export AWS_PROFILE=<profile_name>
 	```
 
-2. Start demo: 
+2. Configure `vars.json`.
+
+3. Start demo: 
 	```
 	make start-demo EC2_KEY_PATH=</path/to/EC2/key> REGISTRY_NAME=<registry_name> ACTIVATION_CODE=<activation_code> STACK_NAME=<stack_name> REGION=<aws_region> PASSWORD=<password>
 	```
@@ -37,7 +38,7 @@ Spin up test environment in order to trial Trend Micro's Smart Check product. Th
 		* `PASSWORD` - Default: `password`
 		* `ACTIVATION_CODE` - Default: `<NONE>`
 
-3. Set up Smart Check:
+4. Set up Smart Check:
 	1. Browse to the provided Smart Check URI.
 	2. Authenticate with the provided username and password.
 	3. Set a registry name and description.
@@ -46,7 +47,7 @@ Spin up test environment in order to trial Trend Micro's Smart Check product. Th
 	7. Set `Authentication Mode` to `Instance Role`.
 	8. Click **Next** to get started.
 
-4. When you're done, stop the demo:
+5. When you're done, stop the demo:
 	```
 	make stop-demo
 	```
