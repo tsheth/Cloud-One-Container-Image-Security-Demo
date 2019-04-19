@@ -1,4 +1,4 @@
-REGION?=ap-southeast-2
+AWS_REGION?=ap-southeast-2
 STACK_NAME?=SmartCheckDemo
 REGISTRY_NAME=smart-check-demo
 PASSWORD=password
@@ -46,6 +46,7 @@ get-config:
 	--stack-name=${STACK_NAME} \
 	--query 'Stacks[0].Outputs[?OutputKey==`MasterPrivateIp`].OutputValue' --output text)"; \
 	echo Master private IP is $$MASTER_PRIVATE_IP; \
+	mkdir ${HOME}/.kube/ &>/dev/null; \
 	KUBE_CFG_DIR=${HOME}/.kube/config; \
 	echo Downloading Kube config file from Master node and storing it locally in $$KUBE_CFG_DIR; \
 	CMD=echo scp -oStrictHostKeyChecking=no -i ${EC2_KEY_PATH} -o ProxyCommand="ssh -oStrictHostKeyChecking=no -i ${EC2_KEY_PATH} ubuntu@$$BASTION_PUBLIC_IP nc %h %p" ubuntu@$$MASTER_PRIVATE_IP:~/kubeconfig ${HOME}/.kube/config &>/dev/null;
@@ -102,8 +103,8 @@ delete-registry:
 .PHONY: upload-images
 upload-images:
 	@echo Logging into demo registry
-	@ECR_LOGIN="$(shell aws ecr get-login --no-include-email --region ${REGION})" &>/dev/null; \
-	$$ECR_LOGIN > /dev/null; \
+	@ECR_LOGIN="$(shell aws ecr get-login --no-include-email --region ${AWS_REGION})"; \
+	eval $$ECR_LOGIN > /dev/null; \
 	echo Downloading buamod/eicar; \
 	docker pull buamod/eicar > /dev/null; \
 	EICAR_HASH="$(shell docker image ls | grep buamod/eicar | awk '{print $$3}')"; \
@@ -131,6 +132,8 @@ get-smart-check-details:
 
 	@ SC_PASSWORD="$(shell kubectl get secrets -o jsonpath='{ .data.password }' deepsecurity-smartcheck-auth | base64 --decode)"; \
 	echo Smart Check Password: $$SC_PASSWORD
+
+	@echo ECR Region: ${AWS_REGION}
 
 	@ REGISTRY_ID="$(shell aws ecr describe-repositories --output text --query 'repositories[?repositoryName==`${REGISTRY_NAME}`][registryId]')"; \
 	echo ECR Reigstry ID: $$REGISTRY_ID

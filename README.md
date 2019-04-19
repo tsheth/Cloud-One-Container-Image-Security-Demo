@@ -14,6 +14,7 @@ Spin up test environment in order to trial Trend Micro's Smart Check product. Th
 4. Install [Docker](https://docs.docker.com/install/linux/docker-ce/ubuntu/).
 5. Install [kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl/) - `sudo snap install kubectl --classic`
 6. Install [Helm](https://helm.sh/docs/using_helm/#installing-helm) - `sudo snap install helm --classic`
+7. Configure Docker to run [without `sudo`](https://docs.docker.com/install/linux/linux-postinstall/)
 
 ## Demo
 1. Set `AWS_PROFILE`:
