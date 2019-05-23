@@ -28,14 +28,14 @@ Spin up test environment in order to trial Trend Micro's Smart Check product. Th
 
 3. Start demo: 
 	```
-	make start-demo EC2_KEY_PATH=</path/to/EC2/key> REGISTRY_NAME=<registry_name> ACTIVATION_CODE=<activation_code> STACK_NAME=<stack_name> REGION=<aws_region> PASSWORD=<password>
+	make start-demo EC2_KEY_PATH=</path/to/EC2/key> IMAGE_REPO_NAME=<repo_name> ACTIVATION_CODE=<activation_code> STACK_NAME=<stack_name> REGION=<aws_region> PASSWORD=<password>
 	```
 
 	* Mandatory argument: 
 		* `EC2_KEY_PATH`
 	* Optional arguments: 
 		* `STACK_NAME` - Default: `SmartCheckDemo`
-		* `REGISTRY_NAME` - Default: `smart-check-demo`
+		* `IMAGE_REPO_NAME` - Default: `smart-check-demo`
 		* `REGION` - Default: `ap-southeast-2`
 		* `PASSWORD` - Default: `password`
 		* `ACTIVATION_CODE` - Default: `<NONE>`
