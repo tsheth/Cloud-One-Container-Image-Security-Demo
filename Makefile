@@ -142,7 +142,7 @@ get-smart-check-details:
 	@echo ----------------------------------------------------------------------------------------------------------------
 
 .PHONY: start-demo
-start-demo: | check-key-provided validate create-image-repo create-stack get-config setup-tiller install-smart-check upload-images get-smart-check-details
+start-demo: | check-key-provided validate create-image-repo create-stack get-config setup-tiller install-smart-check get-smart-check-details
 
 .PHONY: update-stack
 update-stack:
