@@ -1,9 +1,13 @@
 AWS_REGION?=ap-southeast-2
+AWS_AZ?=ap-southeast-2a
 STACK_NAME?=SmartCheckDemo
 IMAGE_REPO_NAME=smart-check-demo
+SC_REGISTRY_USER?= sc
 PASSWORD=password
 ACTIVATION_CODE=
+EC2_KEY_NAME=
 EC2_KEY_PATH=
+ADMIN_CIDR?=0.0.0.0/0
 
 .PHONY: validate
 validate:
@@ -18,7 +22,10 @@ create-stack:
 	@aws cloudformation --region ${AWS_REGION} create-stack \
 	--stack-name ${STACK_NAME} \
 	--template-url https://aws-quickstart.s3.amazonaws.com/quickstart-vmware/templates/kubernetes-cluster-with-new-vpc.template \
-	--parameters file://vars.json \
+	--parameters \
+	ParameterKey=AvailabilityZone,ParameterValue=${AWS_AZ} \
+	ParameterKey=KeyName,ParameterValue=${EC2_KEY_NAME} \
+	ParameterKey=AdminIngressLocation,ParameterValue=${ADMIN_CIDR} \
 	--capabilities CAPABILITY_NAMED_IAM CAPABILITY_AUTO_EXPAND > \
 	/dev/null
 

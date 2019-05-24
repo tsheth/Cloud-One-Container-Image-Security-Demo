@@ -24,23 +24,25 @@ Spin up test environment in order to trial Trend Micro's Smart Check product. Th
 	export AWS_PROFILE=<profile_name>
 	```
 
-2. Configure `vars.json`.
-
-3. Start demo: 
+2. Start demo: 
 	```
-	make start-demo EC2_KEY_PATH=</path/to/EC2/key> IMAGE_REPO_NAME=<repo_name> ACTIVATION_CODE=<activation_code> STACK_NAME=<stack_name> REGION=<aws_region> PASSWORD=<password>
+	make start-demo EC2_KEY_NAME=<key> EC2_KEY_PATH=</path/to/EC2/key> STACK_NAME=<stack_name> IMAGE_REPO_NAME=<repo_name> AWS_REGION=<aws_region> AWS_AZ=<aws_az> ADMIN_CIDR=<x.x.x.x/x> PASSWORD=<password> ACTIVATION_CODE=<activation_code>
 	```
 
-	* Mandatory argument: 
-		* `EC2_KEY_PATH`
+	* Mandatory arguments:
+		* `EC2_KEY_NAME` - Name of the key stored in AWS 
+		* `EC2_KEY_PATH` - Path of the key file stored on your machine
 	* Optional arguments: 
 		* `STACK_NAME` - Default: `SmartCheckDemo`
-		* `IMAGE_REPO_NAME` - Default: `smart-check-demo`
-		* `REGION` - Default: `ap-southeast-2`
+		* `IMAGE_REPO_NAME` - Default: `smart-check-demo` - **Note:** Must be lowercase.
+		* `AWS_REGION` - Default: `ap-southeast-2`
+		* `AWS_AZ` - Default: `ap-southeast-2a`
+		* `ADMIN_CIDR` - Default: `0.0.0.0/0`
+		* `SC_REGISTRY_USER` - Default `sc`
 		* `PASSWORD` - Default: `password`
 		* `ACTIVATION_CODE` - Default: `<NONE>`
 
-4. Set up Smart Check:
+3. Set up Smart Check:
 	1. Browse to the provided Smart Check URI.
 	2. Authenticate with the provided username and password.
 	3. Set a registry name and description.
