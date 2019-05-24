@@ -56,7 +56,9 @@ get-config:
 	mkdir ${HOME}/.kube/ &>/dev/null; \
 	KUBE_CFG_DIR=${HOME}/.kube/config; \
 	echo Downloading Kube config file from Master node and storing it locally in $$KUBE_CFG_DIR; \
-	CMD=echo scp -oStrictHostKeyChecking=no -i ${EC2_KEY_PATH} -o ProxyCommand="ssh -oStrictHostKeyChecking=no -i ${EC2_KEY_PATH} ubuntu@$$BASTION_PUBLIC_IP nc %h %p" ubuntu@$$MASTER_PRIVATE_IP:~/kubeconfig ${HOME}/.kube/config &>/dev/null;
+	CMD=echo scp -oStrictHostKeyChecking=no -i ${EC2_KEY_PATH} -o ProxyCommand="ssh -oStrictHostKeyChecking=no -i ${EC2_KEY_PATH} ubuntu@$$BASTION_PUBLIC_IP nc %h %p" ubuntu@$$MASTER_PRIVATE_IP:~/kubeconfig ${HOME}/.kube/config &>/dev/null; \
+	sleep 5; \
+	cp ${HOME}/.kube/config ${HOME}/.kube/${STACK_NAME}-config;
 
 	@sleep 10
 
@@ -150,6 +152,9 @@ get-smart-check-details:
 
 .PHONY: start-demo
 start-demo: | check-key-provided validate create-image-repo create-stack get-config setup-tiller install-smart-check get-smart-check-details
+
+.PHONY: start-demo-no-sc
+start-demo-no-sc: | check-key-provided validate create-image-repo create-stack get-config setup-tiller
 
 .PHONY: update-stack
 update-stack:
