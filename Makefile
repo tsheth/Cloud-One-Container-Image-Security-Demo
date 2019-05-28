@@ -150,14 +150,14 @@ get-smart-check-details:
 
 	@echo ----------------------------------------------------------------------------------------------------------------
 
-.PHONY: start-demo
-start-demo: | check-key-provided validate create-image-repo create-stack get-config setup-tiller install-smart-check get-smart-check-details
+.PHONY: start
+start: | check-key-provided validate create-image-repo create-stack get-config setup-tiller install-smart-check get-smart-check-details
 
-.PHONY: start-demo-no-sc
-start-demo-no-sc: | check-key-provided validate create-image-repo create-stack get-config setup-tiller
+.PHONY: start-no-sc
+start-no-sc: | check-key-provided validate create-image-repo create-stack get-config setup-tiller
 
-.PHONY: update-stack
-update-stack:
+.PHONY: update
+update:
 	@echo Updating demo cluster
 	@aws cloudformation --region ${AWS_REGION} update-stack \
 	--stack-name ${STACK_NAME} \
@@ -179,5 +179,5 @@ delete-stack:
 	@aws cloudformation --region ${AWS_REGION} wait stack-delete-complete --stack-name ${STACK_NAME} \
 	> /dev/null
 
-.PHONY: stop-demo
-stop-demo: | delete-image-repo delete-stack
+.PHONY: stop
+stop: | delete-image-repo delete-stack

@@ -26,7 +26,7 @@ Spin up test environment in order to trial Trend Micro's Smart Check product. Th
 
 2. Start demo: 
 	```
-	make start-demo EC2_KEY_NAME=<key> EC2_KEY_PATH=</path/to/EC2/key> STACK_NAME=<stack_name> IMAGE_REPO_NAME=<repo_name> AWS_REGION=<aws_region> AWS_AZ=<aws_az> ADMIN_CIDR=<x.x.x.x/x> PASSWORD=<password> ACTIVATION_CODE=<activation_code>
+	make start EC2_KEY_NAME=<key> EC2_KEY_PATH=</path/to/EC2/key> STACK_NAME=<stack_name> IMAGE_REPO_NAME=<repo_name> AWS_REGION=<aws_region> AWS_AZ=<aws_az> ADMIN_CIDR=<x.x.x.x/x> PASSWORD=<password> ACTIVATION_CODE=<activation_code>
 	```
 
 	* Mandatory arguments:
@@ -53,7 +53,7 @@ Spin up test environment in order to trial Trend Micro's Smart Check product. Th
 
 5. When you're done, stop the demo:
 	```
-	make stop-demo
+	make stop
 	```
 
 **Note 1**: The Load Balancer can take a few minutes to intialise. If you cannot access the Smart Check URI after the script finishes running, continue refreshing your browser. 
