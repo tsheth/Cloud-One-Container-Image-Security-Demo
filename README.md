@@ -25,6 +25,7 @@ Spin up test environment in order to trial Trend Micro's Smart Check product. Th
 	```
 
 2. Start demo: 
+
 	```
 	make start EC2_KEY_NAME=<key> EC2_KEY_PATH=</path/to/EC2/key> STACK_NAME=<stack_name> IMAGE_REPO_NAME=<repo_name> AWS_REGION=<aws_region> AWS_AZ=<aws_az> ADMIN_CIDR=<x.x.x.x/x> PASSWORD=<password> ACTIVATION_CODE=<activation_code>
 	```
@@ -52,6 +53,7 @@ Spin up test environment in order to trial Trend Micro's Smart Check product. Th
 	8. Click **Next** to get started.
 
 5. When you're done, stop the demo:
+
 	```
 	make stop
 	```
@@ -60,12 +62,19 @@ Spin up test environment in order to trial Trend Micro's Smart Check product. Th
 
 **Note 2**: Sometimes the CloudFormation template fails to remove all resources. If this occurs, you'll need to manually delete the Load Balancer and VPC created by the demo.
 
+## Upload Demo Images (Optional)
+
+```
+make upload-images
+
+```
+
 ## Example
 
 ```
 $ make start-demo EC2_KEY_PATH=~/.ssh/DemoKey STACK_NAME=SmartCheckDemo2
 Validating template
-Creating demo registry
+Creating demo image repository
 Spinning up demo cluster...
 make[1]: Entering directory '/home/demo/smartcheck'
 make[1]: Leaving directory '/home/demo/smartcheck'
@@ -79,12 +88,6 @@ kubeconfig                                                                      
 Setting up Tiller
 Sleeping for 60 seconds to allow the Tiller pod to spin up
 Installing smart-check chart
-Logging into demo registry
-Downloading buamod/eicar
-Downloading vulnerables/web-dvwa
-Tagging images
-Uploading buamod/eicar (vulnerable) to demo registry
-Uploading vulnerables/web-dvwa (infected) to demo registry
 ----------------------------------------------------------------------------------------------------------------
 Smart Check URI: https://ae23478324a5c4111e9bb20028e2219c2f-75936593.ap-southeast-2.elb.amazonaws.com:443/
 Smart Check Username: administrator
