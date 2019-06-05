@@ -66,7 +66,6 @@ Spin up test environment in order to trial Trend Micro's Smart Check product. Th
 
 ```
 make upload-images
-
 ```
 
 ## Example

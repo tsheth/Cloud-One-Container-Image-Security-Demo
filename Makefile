@@ -156,6 +156,9 @@ start: | check-key-provided validate create-image-repo create-stack get-config s
 .PHONY: start-no-sc
 start-no-sc: | check-key-provided validate create-image-repo create-stack get-config setup-tiller
 
+.PHONY: start-no-repo
+start-no-repo: | check-key-provided validate create-stack get-config setup-tiller
+
 .PHONY: update
 update:
 	@echo Updating demo cluster
