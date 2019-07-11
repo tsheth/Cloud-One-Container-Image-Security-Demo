@@ -1,96 +1,83 @@
 # Trend Micro Smart Check Demo
 
-Spin up test environment in order to trial Trend Micro's Smart Check product. The script creates the following:
-* An EKS Cluster
-* AWS ECR
-* Two demo vulnerable Docker images
-* Smart Check
+Spin up test environment in order to trial Trend Micro's Smart Check product.
 
-## Pre Requisites
+# Instructions
 
-1. Register for a 30-day [trial licence](https://go2.trendmicro.com/geoip/trial-168).
-2. Set up your [AWS profile](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-profiles.html).
-3. Create an [EC2 key](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-key-pairs.html) and download it to your machine.
-4. Install [aws cli](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-install.html) - `sudo snap install aws-cli --classic`
-5. Install [Docker](https://docs.docker.com/install/linux/docker-ce/ubuntu/).
-6. Install [kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl/) - `sudo snap install kubectl --classic`
-7. Install [Helm](https://helm.sh/docs/using_helm/#installing-helm) - `sudo snap install helm --classic`
-8. Configure Docker to run [without `sudo`](https://docs.docker.com/install/linux/linux-postinstall/)
-
-## Demo
-1. Set `AWS_PROFILE`:
+1. Clone this repo:
 
 	```
-	export AWS_PROFILE=<profile_name>
+	git clone git@github.com:OzNetNerd/Deep-Security-Smart-Check-Demo.git
 	```
 
-2. Start demo: 
+2. Spin up an EC2 instance:
+
+	*Note*: `AdminIp` is optional. It defaults to `0.0.0.0/0`:
 
 	```
-	make start EC2_KEY_NAME=<key> EC2_KEY_PATH=</path/to/EC2/key> STACK_NAME=<stack_name> IMAGE_REPO_NAME=<repo_name> AWS_REGION=<aws_region> AWS_AZ=<aws_az> ADMIN_CIDR=<x.x.x.x/x> PASSWORD=<password> ACTIVATION_CODE=<activation_code>
+	cd Deep-Security-Smart-Check-Demo/code
+	aws cloudformation create-stack --stack-name eksctl-host \
+	--parameters ParameterKey=AmiId,ParameterValue=<AWS_LINUX2_AMI> \
+	 ParameterKey=VpcId,ParameterValue=<VPC_ID> \
+	 ParameterKey=AdminIp,ParameterValue=<YOUR_PUBLIC_IP> \
+	 ParameterKey=SubnetId,ParameterValue=<SUBNET_ID> \
+	 ParameterKey=KeyPair,ParameterValue=<KEY_NAME> \
+	 --template-body file://cfn.yml \
+	 --capabilities CAPABILITY_IAM
+	```
+	
+3. Obtain the EC2 instance hostname:
+
+	```
+	aws cloudformation \
+	--region <AWS_REGION> describe-stacks \
+	--stack-name=eksctl-host \
+	--query 'Stacks[0].Outputs[?OutputKey==`Ec2InstanceHostname`].OutputValue' \
+	--output text
 	```
 
-	* Mandatory arguments:
-		* `EC2_KEY_NAME` - Name of the key stored in AWS 
-		* `EC2_KEY_PATH` - Path of the key file stored on your machine
-	* Optional arguments: 
-		* `STACK_NAME` - Default: `SmartCheckDemo`
-		* `IMAGE_REPO_NAME` - Default: `smart-check-demo` - **Note:** Must be lowercase.
-		* `AWS_REGION` - Default: `ap-southeast-2`
-		* `AWS_AZ` - Default: `ap-southeast-2a`
-		* `ADMIN_CIDR` - Default: `0.0.0.0/0`
-		* `SC_REGISTRY_USER` - Default `sc`
-		* `PASSWORD` - Default: `password`
-		* `ACTIVATION_CODE` - Default: `<NONE>`
+3. SSH into the instance and start the EKS cluster:
+	
+	```
+	eksctl create cluster --name=<CLUSTER_NAME> \
+	--nodes=3 \
+	--region=<AWS_REGION>
 
-3. Set up Smart Check:
+4. Install Smart Check.
+
+	*Note:* `<repo-name>` must be in lowercase:
+
+	```
+	make start \
+	AWS_REGION=<AWS_REGION> \
+	IMAGE_REPO_NAME=<repo-name>
+	```
+
+	*Note*: The Load Balancer can take a few minutes to intialise. If you cannot access the Smart Check URI after the script finishes running, continue refreshing your browser.
+
+5. Set up Smart Check:
 	1. Browse to the provided Smart Check URI.
 	2. Authenticate with the provided username and password.
 	3. Set a registry name and description.
-	5. Set `Region` to `ap-southeast-2`, unless you specified a different region when running `make`.
-	6. Input the provided ECR `Registry ID`.
-	7. Set `Authentication Mode` to `Instance Role`.
-	8. Click **Next** to get started.
+	5. Set `Region`.
+	6. Set `Authentication Mode` to `Instance Role`.
+	7. Click **Next** to get started.
 
-5. When you're done, stop the demo:
+6. When you're done, stop the demo:
 
 	```
-	make stop
+	eksctl delete cluster \
+	--name=<CLUSTER_NAME> \
+	--region=<AWS_REGION>
+	
+	make stop \
+	AWS_REGION=<AWS_REGION>
 	```
 
-**Note 1**: The Load Balancer can take a few minutes to intialise. If you cannot access the Smart Check URI after the script finishes running, continue refreshing your browser. 
-
-**Note 2**: Sometimes the CloudFormation template fails to remove all resources. If this occurs, you'll need to manually delete the Load Balancer and VPC created by the demo.
+**Note**: Sometimes the CloudFormation template fails to remove all resources. If this occurs, you'll need to manually delete the Load Balancer and VPC created by the demo.
 
 ## Upload Demo Images (Optional)
 
 ```
 make upload-images
-```
-
-## Example
-
-```
-$ make start-demo EC2_KEY_PATH=~/.ssh/DemoKey STACK_NAME=SmartCheckDemo2
-Validating template
-Creating demo image repository
-Spinning up demo cluster...
-make[1]: Entering directory '/home/demo/smartcheck'
-make[1]: Leaving directory '/home/demo/smartcheck'
-Extracting IP addresses...
-Bastion IP is 54.42.43.19
-Master private IP is 10.0.31.10
-Downloading Kube config file from Master node and storing it locally in /home/demo/.kube/config
-Warning: Permanently added '54.206.40.17' (ECDSA) to the list of known hosts.
-Warning: Permanently added '10.0.31.10' (ECDSA) to the list of known hosts.
-kubeconfig                                                                                                                                                                                                                                100% 5402    98.7KB/s   00:00    
-Setting up Tiller
-Sleeping for 60 seconds to allow the Tiller pod to spin up
-Installing smart-check chart
-----------------------------------------------------------------------------------------------------------------
-Smart Check URI: https://ae23478324a5c4111e9bb20028e2219c2f-75936593.ap-southeast-2.elb.amazonaws.com:443/
-Smart Check Username: administrator
-Smart Check Password: ke7982(2j3@#7
-ECR Reigstry ID: 856284940264
-----------------------------------------------------------------------------------------------------------------
 ```

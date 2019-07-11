@@ -1,0 +1,196 @@
+---
+Parameters:
+  AdminIp:
+    Type: String
+    Default: 0.0.0.0/0
+  AmiId:
+    Description: AWS Linux 2 AMI ID
+    Type: AWS::EC2::Image::Id
+  VpcId:
+    Type: AWS::EC2::VPC::Id
+  SubnetId:
+    Description: Subnet ID with public IP addressing
+    Type: AWS::EC2::Subnet::Id
+  KeyPair:
+    Type: AWS::EC2::KeyPair::KeyName
+
+Resources:
+  Ec2Instance:
+    Type: AWS::EC2::Instance
+    Properties:
+      ImageId: !Ref AmiId
+      KeyName: !Ref KeyPair
+      SubnetId: !Ref SubnetId
+      InstanceType: t2.micro
+      SecurityGroupIds:
+        - !Ref Ec2InstanceSecurityGroup
+      IamInstanceProfile: !Ref EksInstanceProfile
+      UserData:
+        Fn::Base64: !Sub |
+          #!/usr/bin/env bash
+          yum update -y
+          yum upgrade -y
+          amazon-linux-extras install -y docker
+          systemctl enable docker
+          systemctl restart docker
+          usermod -a -G docker ec2-user
+          curl -L "https://github.com/docker/compose/releases/download/1.24.0/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+          chmod +x /usr/local/bin/docker-compose
+          mkdir -p /home/ec2-user
+          curl --silent --location "https://github.com/weaveworks/eksctl/releases/download/latest_release/eksctl_$(uname -s)_amd64.tar.gz" | tar xz -C /tmp
+          chmod +x /tmp/eksctl
+          mv /tmp/eksctl /usr/local/bin
+          curl -o aws-iam-authenticator https://amazon-eks.s3-us-west-2.amazonaws.com/1.13.7/2019-06-11/bin/linux/amd64/aws-iam-authenticator
+          chmod +x ./aws-iam-authenticator
+          sudo mv aws-iam-authenticator /usr/local/bin
+          curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl
+          chmod +x ./kubectl
+          mv ./kubectl /usr/local/bin/kubectl
+          yum install bash-completion --enablerepo=epel -y
+          echo 'source <(kubectl completion bash)' >>~/.bashrc
+          curl https://raw.githubusercontent.com/kubernetes/helm/master/scripts/get > get_helm.sh
+          chmod +x get_helm.sh
+          ./get_helm.sh
+          rm -rf ./get_helm.sh
+          wget https://raw.githubusercontent.com/OzNetNerd/Deep-Security-Smart-Check-Demo/master/Makefile
+          chown ec2-user:ec2-user Makefile
+          mv ./Makefile /home/ec2-user
+      Tags:
+        - Key: Name
+          Value: eksctl
+
+  Ec2InstanceSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Allow access to the eksctl machine
+      SecurityGroupIngress:
+      - IpProtocol: tcp
+        FromPort: 22
+        ToPort: 22
+        CidrIp: !Ref AdminIp
+      VpcId: !Ref VpcId
+
+  EksEc2Role:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: "Allow"
+            Principal:
+              Service:
+                - "ec2.amazonaws.com"
+            Action:
+              - "sts:AssumeRole"
+
+  EksInstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      Path: /
+      Roles:
+        - !Ref EksEc2Role
+
+  EksEc2Policy:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyName: 'eksctl'
+      Roles:
+        - !Ref EksEc2Role
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Sid: VisualEditor0
+          Effect: Allow
+          Action:
+          - iam:CreateInstanceProfile
+          - iam:DeleteInstanceProfile
+          - iam:GetRole
+          - iam:GetInstanceProfile
+          - iam:RemoveRoleFromInstanceProfile
+          - iam:CreateRole
+          - iam:DeleteRole
+          - iam:AttachRolePolicy
+          - iam:PutRolePolicy
+          - iam:ListInstanceProfiles
+          - iam:AddRoleToInstanceProfile
+          - iam:ListInstanceProfilesForRole
+          - iam:PassRole
+          - iam:CreateServiceLinkedRole
+          - iam:DetachRolePolicy
+          - iam:DeleteRolePolicy
+          - iam:DeleteServiceLinkedRole
+          - ec2:DeleteInternetGateway
+          - iam:GetRolePolicy
+          Resource:
+          - !Sub 'arn:aws:iam::${AWS::AccountId}:role/eksctl-*'
+          - !Sub 'arn:aws:iam::${AWS::AccountId}:instance-profile/eksctl-*'
+          - arn:aws:ec2:*:*:internet-gateway/*
+        - Sid: VisualEditor1
+          Effect: Allow
+          Action:
+          - ec2:AuthorizeSecurityGroupIngress
+          - ec2:DeleteSubnet
+          - ec2:AttachInternetGateway
+          - ec2:DeleteRouteTable
+          - ec2:AssociateRouteTable
+          - ec2:DescribeInternetGateways
+          - ec2:CreateRoute
+          - ec2:CreateInternetGateway
+          - ec2:RevokeSecurityGroupEgress
+          - autoscaling:DescribeAutoScalingGroups
+          - autoscaling:UpdateAutoScalingGroup
+          - ec2:DeleteInternetGateway
+          - ec2:DescribeKeyPairs
+          - ec2:DescribeRouteTables
+          - ec2:ImportKeyPair
+          - ec2:DescribeLaunchTemplates
+          - ec2:CreateTags
+          - ec2:CreateRouteTable
+          - ec2:RunInstances
+          - cloudformation:*
+          - ec2:DetachInternetGateway
+          - ec2:DisassociateRouteTable
+          - ec2:RevokeSecurityGroupIngress
+          - ec2:DescribeImageAttribute
+          - ec2:DeleteNatGateway
+          - ec2:DeleteVpc
+          - autoscaling:DeleteAutoScalingGroup
+          - ec2:CreateSubnet
+          - ec2:DescribeSubnets
+          - eks:*
+          - autoscaling:CreateAutoScalingGroup
+          - ec2:DescribeAddresses
+          - ec2:DeleteTags
+          - ec2:CreateNatGateway
+          - autoscaling:DescribeLaunchConfigurations
+          - ec2:CreateVpc
+          - ec2:DescribeVpcAttribute
+          - ec2:DescribeAvailabilityZones
+          - autoscaling:DescribeScalingActivities
+          - ec2:CreateSecurityGroup
+          - ec2:ModifyVpcAttribute
+          - ec2:ReleaseAddress
+          - ec2:AuthorizeSecurityGroupEgress
+          - ec2:DeleteLaunchTemplate
+          - ec2:DescribeTags
+          - ec2:DeleteRoute
+          - ec2:DescribeLaunchTemplateVersions
+          - ec2:DescribeNatGateways
+          - ec2:AllocateAddress
+          - ec2:DescribeSecurityGroups
+          - ec2:DescribeImages
+          - autoscaling:CreateLaunchConfiguration
+          - ec2:CreateLaunchTemplate
+          - autoscaling:DeleteLaunchConfiguration
+          - ec2:DescribeVpcs
+          - ec2:DeleteSecurityGroup
+          Resource: "*"
+        - Sid: VisualEditor2
+          Effect: Allow
+          Action: ecr:CreateRepository
+          Resource: "*"
+Outputs:
+  Ec2InstanceHostname:
+    Value: !GetAtt Ec2Instance.PublicDnsName
+    Export:
+      Name: !Sub "${AWS::StackName}-Ec2Instance"
