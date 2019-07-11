@@ -12,7 +12,7 @@ Spin up test environment in order to trial Trend Micro's Smart Check product.
 
 2. Spin up an EC2 instance:
 
-	*Note*: `AdminIp` is optional. It defaults to `0.0.0.0/0`:
+	**Note**: `AdminIp` is optional. It defaults to `0.0.0.0/0`:
 
 	```
 	cd Deep-Security-Smart-Check-Demo/code
@@ -42,10 +42,11 @@ Spin up test environment in order to trial Trend Micro's Smart Check product.
 	eksctl create cluster --name=<CLUSTER_NAME> \
 	--nodes=3 \
 	--region=<AWS_REGION>
+	```
 
 4. Install Smart Check.
 
-	*Note:* `<repo-name>` must be in lowercase:
+	**Note:** `<repo-name>` must be in lowercase:
 
 	```
 	make start \
@@ -79,5 +80,7 @@ Spin up test environment in order to trial Trend Micro's Smart Check product.
 ## Upload Demo Images (Optional)
 
 ```
-make upload-images
+make upload-images \
+AWS_REGION=<AWS_REGION> \
+IMAGE_REPO_NAME=<repo-name>
 ```

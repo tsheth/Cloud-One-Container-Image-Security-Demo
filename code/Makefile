@@ -79,18 +79,13 @@ upload-images:
 
 .PHONY: get-smart-check-details
 get-smart-check-details:
-	@sleep 10
-	@echo ----------------------------------------------------------------------------------------------------------------
-
-	@ SMARTCHECK_URL="$(shell kubectl get svc proxy -o jsonpath='{.status.loadBalancer.ingress[0].hostname}')"; \
-	echo Smart Check URI: https://$$SMARTCHECK_URL:443/
-
-	@ SC_USERNAME="$(shell kubectl get secrets -o jsonpath='{ .data.userName }' deepsecurity-smartcheck-auth | base64 --decode)"; \
-	echo Smart Check Username: $$SC_USERNAME
-
-	@ SC_PASSWORD="$(shell kubectl get secrets -o jsonpath='{ .data.password }' deepsecurity-smartcheck-auth | base64 --decode)"; \
-	echo Smart Check Password: $$SC_PASSWORD
-
-	@echo ECR Region: ${AWS_REGION}
-
-	@echo ----------------------------------------------------------------------------------------------------------------
+	@sleep 5; \
+	echo ----------------------------------------------------------------------------------------------------------------; \
+	SMARTCHECK_URL="$(shell kubectl get svc proxy -o jsonpath='{.status.loadBalancer.ingress[0].hostname}')"; \
+	echo Smart Check URI: https://$$SMARTCHECK_URL:443/;\
+	SC_USERNAME="$(shell kubectl get secrets -o jsonpath='{ .data.userName }' deepsecurity-smartcheck-auth | base64 --decode)"; \
+	echo Smart Check Username: $$SC_USERNAME; \
+	SC_PASSWORD="$(shell kubectl get secrets -o jsonpath='{ .data.password }' deepsecurity-smartcheck-auth | base64 --decode)"; \
+	echo Smart Check Password: $$SC_PASSWORD; \
+	echo ECR Region: ${AWS_REGION}; \
+	echo ----------------------------------------------------------------------------------------------------------------;
