@@ -72,7 +72,8 @@ Spin up test environment in order to trial Trend Micro's Smart Check product.
 	--region=<AWS_REGION>
 	
 	make stop \
-	AWS_REGION=<AWS_REGION>
+	AWS_REGION=<AWS_REGION> \
+	IMAGE_REPO_NAME=<repo-name>
 	```
 
 **Note**: Sometimes the CloudFormation template fails to remove all resources. If this occurs, you'll need to manually delete the Load Balancer and VPC created by the demo.
