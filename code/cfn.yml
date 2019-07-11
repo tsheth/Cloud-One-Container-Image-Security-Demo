@@ -52,7 +52,7 @@ Resources:
           chmod +x get_helm.sh
           ./get_helm.sh
           rm -rf ./get_helm.sh
-          wget https://raw.githubusercontent.com/OzNetNerd/Deep-Security-Smart-Check-Demo/master/Makefile
+          wget https://raw.githubusercontent.com/OzNetNerd/Deep-Security-Smart-Check-Demo/master/code/Makefile
           chown ec2-user:ec2-user Makefile
           mv ./Makefile /home/ec2-user
       Tags:
