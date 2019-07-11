@@ -18,7 +18,7 @@ validate:
 
 .PHONY: create-stack
 create-stack:
-	@echo Spinning up demo cluster...
+	@echo Spinning up cluster...
 	@aws cloudformation --region ${AWS_REGION} create-stack \
 	--stack-name ${STACK_NAME} \
 	--template-url https://aws-quickstart.s3.amazonaws.com/quickstart-vmware/templates/kubernetes-cluster-with-new-vpc.template \
@@ -101,17 +101,17 @@ install-smart-check:
 
 .PHONY: create-image-repo
 create-image-repo:
-	@echo Creating demo image repository
+	@echo Creating image repository
 	@aws ecr create-repository --region ${AWS_REGION} --repository-name ${IMAGE_REPO_NAME} > /dev/null
 
 .PHONY: delete-image-repo
 delete-image-repo:
-	@echo Deleting demo image repository
+	@echo Deleting image repository
 	@aws --region ${AWS_REGION} ecr delete-repository --repository-name ${IMAGE_REPO_NAME} --force > /dev/null
 
 .PHONY: upload-images
 upload-images:
-	@echo Logging into demo image registry
+	@echo Logging into image registry
 	@ECR_LOGIN="$(shell aws ecr get-login --no-include-email --region ${AWS_REGION})"; \
 	eval $$ECR_LOGIN > /dev/null; \
 	echo Downloading buamod/eicar; \
@@ -125,9 +125,9 @@ upload-images:
 	echo Tagging images; \
 	docker tag $$EICAR_HASH $$IMAGE_REPO_URI:vulnerable; \
 	docker tag $$DVWA_HASH $$IMAGE_REPO_URI:infected; \
-	echo Uploading buamod/eicar \(vulnerable\) to demo repository; \
+	echo Uploading buamod/eicar \(vulnerable\) to repository; \
 	docker push $$IMAGE_REPO_URI:vulnerable > /dev/null; \
-	echo Uploading vulnerables/web-dvwa \(infected\) to demo repository; \
+	echo Uploading vulnerables/web-dvwa \(infected\) to repository; \
 	docker push $$IMAGE_REPO_URI:infected > /dev/null;
 
 .PHONY: get-smart-check-details
@@ -161,7 +161,7 @@ start-no-repo: | check-key-provided validate create-stack get-config setup-tille
 
 .PHONY: update
 update:
-	@echo Updating demo cluster
+	@echo Updating cluster
 	@aws cloudformation --region ${AWS_REGION} update-stack \
 	--stack-name ${STACK_NAME} \
 	--template-url https://aws-quickstart.s3.amazonaws.com/quickstart-vmware/templates/kubernetes-cluster-with-new-vpc.template \
@@ -169,13 +169,13 @@ update:
 	--capabilities CAPABILITY_NAMED_IAM CAPABILITY_AUTO_EXPAND \
 	> /dev/null
 
-	@echo Waiting for demo cluster update to be complete
+	@echo Waiting for cluster update to be complete
 	@aws cloudformation --region ${AWS_REGION} wait stack-update-complete --stack-name ${STACK_NAME} \
 	> /dev/null
 
 .PHONY: delete-stack
 delete-stack:
-	@echo Spinning down demo cluster...
+	@echo Spinning down cluster...
 	@aws cloudformation --region ${AWS_REGION} delete-stack --stack-name ${STACK_NAME} \
 	> /dev/null
 
