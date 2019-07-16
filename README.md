@@ -12,7 +12,7 @@ Spin up test environment in order to trial Trend Micro's Smart Check product.
 
 2. Spin up an EC2 instance:
 
-	**Note**: `AdminIp` is optional. It defaults to `0.0.0.0/0`:
+	*Note*: `AdminIp` is optional. It defaults to `0.0.0.0/0`:
 
 	```
 	cd Deep-Security-Smart-Check-Demo/code
@@ -52,7 +52,7 @@ Spin up test environment in order to trial Trend Micro's Smart Check product.
 
 4. Install Smart Check.
 
-	**Note:** `<repo-name>` must be in lowercase:
+	*Note:* `<repo-name>` must be in lowercase:
 
 	```
 	make start \
@@ -68,7 +68,7 @@ Spin up test environment in order to trial Trend Micro's Smart Check product.
 	3. Set a registry name and description.
 	5. Set `Region`.
 	6. Set `Authentication Mode` to `Instance Role`.
-	7. Click **Next** to get started.
+	7. Click *Next* to get started.
 
 6. When you're done, stop the demo:
 
@@ -82,7 +82,7 @@ Spin up test environment in order to trial Trend Micro's Smart Check product.
 	IMAGE_REPO_NAME=<repo-name>
 	```
 
-**Note**: Sometimes the CloudFormation template fails to remove all resources. If this occurs, you'll need to manually delete the Load Balancer and VPC created by the demo.
+*Note*: Sometimes the CloudFormation template fails to remove all resources. If this occurs, you'll need to manually delete the Load Balancer and VPC created by the demo.
 
 ## Upload Demo Images (Optional)
 
