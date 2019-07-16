@@ -24,11 +24,15 @@ Spin up test environment in order to trial Trend Micro's Smart Check product.
 	 ParameterKey=KeyPair,ParameterValue=<KEY_NAME> \
 	 --template-body file://cfn.yml \
 	 --capabilities CAPABILITY_IAM
+	
+	 aws cloudformation wait stack-create-complete --stack-name eksctl-host
 	```
 	
 3. Obtain the EC2 instance hostname:
 
 	```
+	ssh ec2-user@e<HOSTNAME> -i ~/.ssh/KEY_NAME>
+	
 	aws cloudformation \
 	--region <AWS_REGION> describe-stacks \
 	--stack-name=eksctl-host \
@@ -36,7 +40,9 @@ Spin up test environment in order to trial Trend Micro's Smart Check product.
 	--output text
 	```
 
-3. SSH into the instance and start the EKS cluster:
+3. SSH into the instance and start the EKS cluster.
+
+	*Note*: You can customise the below command by following the [`eksctl` documentation](https://eksctl.io/):
 	
 	```
 	eksctl create cluster --name=<CLUSTER_NAME> \
