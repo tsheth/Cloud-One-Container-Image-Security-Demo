@@ -31,7 +31,7 @@ Spin up test environment in order to trial Trend Micro's Smart Check product.
 3. Obtain the EC2 instance hostname:
 
 	```
-	ssh ec2-user@e<HOSTNAME> -i ~/.ssh/KEY_NAME>
+	ssh ec2-user@<HOSTNAME> -i ~/.ssh/<KEY_NAME>
 	
 	aws cloudformation \
 	--region <AWS_REGION> describe-stacks \
