@@ -1,5 +1,11 @@
 ---
 Parameters:
+  EcrRepo:
+    Type: String
+  AwsRegion:
+    Type: String
+  EksCtlClusterName:
+    Type: String
   AdminIp:
     Type: String
     Default: 0.0.0.0/0
@@ -52,12 +58,17 @@ Resources:
           chmod +x get_helm.sh
           ./get_helm.sh
           rm -rf ./get_helm.sh
-          wget https://raw.githubusercontent.com/OzNetNerd/Deep-Security-Smart-Check-Demo/master/code/Makefile
-          chown ec2-user:ec2-user Makefile
+          mkdir /home/ec2-user/.kube
+          eksctl create cluster --name=${EksCtlClusterName} --nodes=3 --region=${AwsRegion} --kubeconfig=/home/ec2-user/.kube/config
+          wget https://raw.githubusercontent.com/OzNetNerd/Deep-Security-Smart-Check-Demo/master/code/manual/Makefile
           mv ./Makefile /home/ec2-user
+          cd /home/ec2-user
+          make start AWS_REGION=${AwsRegion} IMAGE_REPO_NAME=${EcrRepo}
+          chown -R ec2-user:ec2-user /home/ec2-user
+          chown ec2-user:ec2-user /home/ec2-user/.kube/config
       Tags:
         - Key: Name
-          Value: eksctl
+          Value: smartcheck-jumphost
 
   Ec2InstanceSecurityGroup:
     Type: AWS::EC2::SecurityGroup
