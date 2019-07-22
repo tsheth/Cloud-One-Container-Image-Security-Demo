@@ -36,7 +36,6 @@ Resources:
           usermod -a -G docker ec2-user
           curl -L "https://github.com/docker/compose/releases/download/1.24.0/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
           chmod +x /usr/local/bin/docker-compose
-          mkdir -p /home/ec2-user
           curl --silent --location "https://github.com/weaveworks/eksctl/releases/download/latest_release/eksctl_$(uname -s)_amd64.tar.gz" | tar xz -C /tmp
           chmod +x /tmp/eksctl
           mv /tmp/eksctl /usr/local/bin
@@ -54,6 +53,7 @@ Resources:
           rm -rf ./get_helm.sh
           wget https://raw.githubusercontent.com/OzNetNerd/Deep-Security-Smart-Check-Demo/master/code/manual/Makefile
           chown ec2-user:ec2-user Makefile
+          mkdir -p /home/ec2-user
           mv ./Makefile /home/ec2-user
       Tags:
         - Key: Name
