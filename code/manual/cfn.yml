@@ -62,7 +62,7 @@ Resources:
   Ec2InstanceSecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
-      GroupDescription: Allow access to the eksctl machine
+      GroupDescription: Allow access to the Smart Check jumpbox
       SecurityGroupIngress:
       - IpProtocol: tcp
         FromPort: 22
