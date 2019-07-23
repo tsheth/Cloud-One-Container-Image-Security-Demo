@@ -9,7 +9,8 @@ curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s htt
 chmod +x ./kubectl
 mv ./kubectl /usr/local/bin/kubectl
 yum install bash-completion --enablerepo=epel -y
-echo 'source <(kubectl completion bash)' >>~/.bashrc
+mkdir -p /home/ec2-user
+echo 'source <(kubectl completion bash)' >>/home/ec2-user/.bashrc
 curl https://raw.githubusercontent.com/kubernetes/helm/master/scripts/get > get_helm.sh
 chmod +x get_helm.sh
 ./get_helm.sh
