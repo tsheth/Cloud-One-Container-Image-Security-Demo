@@ -12,7 +12,7 @@ chmod +x kube-setup.sh
 ./kube-setup.sh
 rm kube-setup.sh
 mkdir -p /home/ec2-user/.kube
-eksctl create cluster --name="$0" --nodes=3 --region="$1" --kubeconfig=/home/ec2-user/.kube/config
+eksctl create cluster --name="$1" --nodes=3 --region="$2" --kubeconfig=/home/ec2-user/.kube/config
 wget https://raw.githubusercontent.com/OzNetNerd/Deep-Security-Smart-Check-Demo/master/code/manual/Makefile
 mkdir /home/ec2-user/kubernetes-config
 mv ./Makefile /home/ec2-user/kubernetes-config

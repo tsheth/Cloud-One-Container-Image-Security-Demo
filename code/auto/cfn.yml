@@ -38,12 +38,6 @@ Resources:
           chmod +x auto-setup.sh
           ./auto-setup.sh ${EksCtlClusterName} ${AwsRegion} ${EcrRepo}
           rm auto-setup.sh
-#          eksctl create cluster --name=${EksCtlClusterName} --nodes=3 --region=${AwsRegion} --kubeconfig=/home/ec2-user/.kube/config
-#          wget https://raw.githubusercontent.com/OzNetNerd/Deep-Security-Smart-Check-Demo/master/code/manual/Makefile
-#          mv ./Makefile /home/ec2-user
-#          cd /home/ec2-user
-#          make start AWS_REGION=${AwsRegion} IMAGE_REPO_NAME=${EcrRepo}
-#          chown -R ec2-user:ec2-user /home/ec2-user
       Tags:
         - Key: Name
           Value: smartcheck-jumphost
