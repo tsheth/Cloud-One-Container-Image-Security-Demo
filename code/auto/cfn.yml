@@ -34,34 +34,16 @@ Resources:
       UserData:
         Fn::Base64: !Sub |
           #!/usr/bin/env bash
-          wget https://raw.githubusercontent.com/OzNetNerd/Packer-Gitlab/master/Packer/config/docker-setup.sh
-          sed -e s/"sudo "//g -i docker-setup.sh
-          chmod +x docker-setup.sh
-          ./docker-setup.sh
-          rm docker-setup.sh
-          curl --silent --location "https://github.com/weaveworks/eksctl/releases/download/latest_release/eksctl_$(uname -s)_amd64.tar.gz" | tar xz -C /tmp
-          chmod +x /tmp/eksctl
-          mv /tmp/eksctl /usr/local/bin
-          curl -o aws-iam-authenticator https://amazon-eks.s3-us-west-2.amazonaws.com/1.13.7/2019-06-11/bin/linux/amd64/aws-iam-authenticator
-          chmod +x ./aws-iam-authenticator
-          mv aws-iam-authenticator /usr/local/bin
-          curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl
-          chmod +x ./kubectl
-          mv ./kubectl /usr/local/bin/kubectl
-          yum install bash-completion --enablerepo=epel -y
-          echo 'source <(kubectl completion bash)' >>~/.bashrc
-          curl https://raw.githubusercontent.com/kubernetes/helm/master/scripts/get > get_helm.sh
-          chmod +x get_helm.sh
-          ./get_helm.sh
-          rm -rf ./get_helm.sh
-          mkdir -p /home/ec2-user
-          mkdir /home/ec2-user/.kube
-          eksctl create cluster --name=${EksCtlClusterName} --nodes=3 --region=${AwsRegion} --kubeconfig=/home/ec2-user/.kube/config
-          wget https://raw.githubusercontent.com/OzNetNerd/Deep-Security-Smart-Check-Demo/master/code/manual/Makefile
-          mv ./Makefile /home/ec2-user
-          cd /home/ec2-user
-          make start AWS_REGION=${AwsRegion} IMAGE_REPO_NAME=${EcrRepo}
-          chown -R ec2-user:ec2-user /home/ec2-user
+          wget https://raw.githubusercontent.com/OzNetNerd/Deep-Security-Smart-Check-Demo/master/code/scripts/auto-setup.sh
+          chmod +x auto-setup.sh
+          ./auto-setup.sh ${EksCtlClusterName} ${AwsRegion} ${EcrRepo}
+          rm auto-setup.sh
+#          eksctl create cluster --name=${EksCtlClusterName} --nodes=3 --region=${AwsRegion} --kubeconfig=/home/ec2-user/.kube/config
+#          wget https://raw.githubusercontent.com/OzNetNerd/Deep-Security-Smart-Check-Demo/master/code/manual/Makefile
+#          mv ./Makefile /home/ec2-user
+#          cd /home/ec2-user
+#          make start AWS_REGION=${AwsRegion} IMAGE_REPO_NAME=${EcrRepo}
+#          chown -R ec2-user:ec2-user /home/ec2-user
       Tags:
         - Key: Name
           Value: smartcheck-jumphost
