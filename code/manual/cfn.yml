@@ -37,10 +37,10 @@ Resources:
           chmod +x kube-setup.sh
           ./kube-setup.sh
           rm kube-setup.sh
-          wget https://raw.githubusercontent.com/OzNetNerd/Deep-Security-Smart-Check-Demo/master/code/manual/Makefile
-          mkdir -p /home/ec2-user
-          mv ./Makefile /home/ec2-user
-          chown -R ec2-user:ec2-user /home/ec2-user
+          wget https://raw.githubusercontent.com/OzNetNerd/Deep-Security-Smart-Check-Demo/master/code/scripts/Makefile
+          mkdir -p /home/ec2-user/kubernetes-config
+          mv ./Makefile /home/ec2-user/kubernetes-config
+          sudo chown -R ec2-user:ec2-user /home/ec2-user
       Tags:
         - Key: Name
           Value: smartcheck-jumphost

@@ -17,6 +17,9 @@ Parameters:
     Type: AWS::EC2::Subnet::Id
   KeyPair:
     Type: AWS::EC2::KeyPair::KeyName
+  MakefileTarget:
+    Type: String
+    Default: start
 
 Resources:
   Ec2Instance:
@@ -34,8 +37,9 @@ Resources:
           #!/usr/bin/env bash
           wget https://raw.githubusercontent.com/OzNetNerd/Deep-Security-Smart-Check-Demo/master/code/auto/auto-setup.sh
           chmod +x auto-setup.sh
-          ./auto-setup.sh ${EksCtlClusterName} ${AwsRegion}
+          ./auto-setup.sh ${EksCtlClusterName} ${AwsRegion} ${MakefileTarget}
           rm auto-setup.sh
+          sudo chown -R ec2-user:ec2-user /home/ec2-user
       Tags:
         - Key: Name
           Value: smartcheck-jumphost

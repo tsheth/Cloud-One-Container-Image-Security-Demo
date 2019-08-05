@@ -86,30 +86,3 @@ get-smart-check-details:
 	echo Smart Check Password: $$SC_PASSWORD; \
 	echo ----------------------------------------------------------------------------------------------------------------;
 
-
-.PHONY: enable-pre-reg
-enable-pre-reg:
-	@ SMARTCHECK_URL="$(shell kubectl get svc proxy -o jsonpath='{.status.loadBalancer.ingress[0].hostname}')"; \
-	cd /tmp; \
-	echo 'Creating certs';
-	openssl req -x509 -newkey rsa:4096 -sha256 -days 3650 -nodes \
-	-keyout dssc.key -out dssc.crt -subj '/CN=example.com' \
-	-extensions san \
-	-config <\(echo '[req]'; echo 'distinguished_name=req'; \
-	echo '[san]'; echo 'subjectAltName=DNS:$$SMARTCHECK_URL'\); \
-	kubectl create secret tls dssc-proxy-certificate \
-    --namespace default \
-    --cert=dssc.crt \
-    --key=dssc.key; \
-	wget https://raw.githubusercontent.com/OzNetNerd/Deep-Security-Smart-Check-Demo/master/code/auto/overrides.yaml; \
-	helm upgrade \
-	--values overrides.yaml \
-	deepsecurity-smartcheck \
-	https://github.com/deep-security/smartcheck-helm/archive/master.tar.gz --reuse-values;
-	kubectl delete pods \
-	--namespace default \
-	-l "service=proxy,release=deepsecurity-smartcheck"; \
-	kubectl get secret dssc-proxy-certificate -o go-template='{{index .data "tls.crt" | base64decode}}'; \
-	sudo mkdir -p /etc/docker/certs.d/$$SMARTCHECK_URL:5000/;
-
-
