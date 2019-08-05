@@ -2,11 +2,11 @@ registry:
     enabled: true
 
     auth:
-    username: testuser
-    password: testpassword
+      username: testuser
+      password: testpassword
 
 certificate:
     secret:
-    name: dssc-proxy-certificate
-    certificate: tls.crt
-    privateKey: tls.key
+      name: dssc-proxy-certificate
+      certificate: tls.crt
+      privateKey: tls.key

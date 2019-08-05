@@ -54,7 +54,7 @@ delete-image-repo:
 	@aws --region ${AWS_REGION} ecr delete-repository --repository-name ${IMAGE_REPO_NAME} --force > /dev/null
 
 .PHONY: upload-images
-upload-images | create-image-repo:
+upload-images:
 	@echo Logging into demo image registry
 	@ECR_LOGIN="$(shell aws ecr get-login --no-include-email --region ${AWS_REGION})"; \
 	eval $$ECR_LOGIN > /dev/null; \
@@ -89,13 +89,14 @@ get-smart-check-details:
 
 .PHONY: enable-pre-reg
 enable-pre-reg:
-	SMARTCHECK_URL="$(shell kubectl get svc proxy -o jsonpath='{.status.loadBalancer.ingress[0].hostname}')"; \
+	@ SMARTCHECK_URL="$(shell kubectl get svc proxy -o jsonpath='{.status.loadBalancer.ingress[0].hostname}')"; \
 	cd /tmp; \
+	echo 'Creating certs';
 	openssl req -x509 -newkey rsa:4096 -sha256 -days 3650 -nodes \
 	-keyout dssc.key -out dssc.crt -subj '/CN=example.com' \
 	-extensions san \
-	-config <(echo '[req]'; echo 'distinguished_name=req'; \
-	echo '[san]'; echo 'subjectAltName=DNS:$$SMARTCHECK_URL'); \
+	-config <\(echo '[req]'; echo 'distinguished_name=req'; \
+	echo '[san]'; echo 'subjectAltName=DNS:$$SMARTCHECK_URL'\); \
 	kubectl create secret tls dssc-proxy-certificate \
     --namespace default \
     --cert=dssc.crt \
