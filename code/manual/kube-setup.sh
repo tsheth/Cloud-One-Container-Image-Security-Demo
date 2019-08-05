@@ -15,3 +15,4 @@ curl https://raw.githubusercontent.com/kubernetes/helm/master/scripts/get > get_
 chmod +x get_helm.sh
 ./get_helm.sh
 rm -rf ./get_helm.sh
+chown -R ec2-user:ec2-user /home/ec2-user
