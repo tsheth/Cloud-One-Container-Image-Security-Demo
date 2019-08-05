@@ -27,7 +27,6 @@ The *Auto* method is recommended for most users as it is the quickest way to get
 	  * `EKSCTL_SUBNET_ID`: Subnet to launch the eksctl node in
 	  * `EC2_KEY_NAME`: EC2 key for accessing the eksctl node
 	  * `AWS_LINUX2_AMI`: AWS AMI ID for Amazon Linux 2 in the specified region
-	  * `ECR_REPO_NAME`: Name of the repo which will be created
 
     Command:
 
@@ -41,7 +40,6 @@ The *Auto* method is recommended for most users as it is the quickest way to get
 	ParameterKey=SubnetId,ParameterValue=<EKSCTL_SUBNET_ID> \
 	ParameterKey=KeyPair,ParameterValue=<EC2_KEY_NAME> \
 	ParameterKey=AmiId,ParameterValue=<AWS_LINUX2_AMI> \
-	ParameterKey=EcrRepo,ParameterValue=<ECR_REPO_NAME> \
 	--template-body file://cfn.yml \
 	--capabilities CAPABILITY_IAM
 	
@@ -114,12 +112,9 @@ If the above `make` file does not work, wait 10 minutes and try again. Your lab 
 
 4. Install Smart Check.
 
-	**Note:** `<repo-name>` must be in lowercase:
-
 	```
 	make start \
-	AWS_REGION=<AWS_REGION> \
-	IMAGE_REPO_NAME=<repo-name>
+	AWS_REGION=<AWS_REGION>
 	```
 
 	**Note**: The Load Balancer can take a few minutes to intialise. If you cannot access the Smart Check URI after the script finishes running, continue refreshing your browser.
@@ -140,8 +135,7 @@ If the above `make` file does not work, wait 10 minutes and try again. Your lab 
 	--region=<AWS_REGION>
 	
 	make stop \
-	AWS_REGION=<AWS_REGION> \
-	IMAGE_REPO_NAME=<repo-name>
+	AWS_REGION=<AWS_REGION>
 	```
 
 **Note**: Sometimes the CloudFormation template fails to remove all resources. If this occurs, you'll need to manually delete the Load Balancer and VPC created by the demo.
@@ -150,6 +144,5 @@ If the above `make` file does not work, wait 10 minutes and try again. Your lab 
 
 ```
 make upload-images \
-AWS_REGION=<AWS_REGION> \
-IMAGE_REPO_NAME=<repo-name>
+AWS_REGION=<AWS_REGION>
 ```

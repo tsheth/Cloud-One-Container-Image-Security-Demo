@@ -1,7 +1,5 @@
 ---
 Parameters:
-  EcrRepo:
-    Type: String
   AwsRegion:
     Type: String
   EksCtlClusterName:
@@ -34,9 +32,9 @@ Resources:
       UserData:
         Fn::Base64: !Sub |
           #!/usr/bin/env bash
-          wget https://raw.githubusercontent.com/OzNetNerd/Deep-Security-Smart-Check-Demo/master/code/scripts/auto-setup.sh
+          wget https://raw.githubusercontent.com/OzNetNerd/Deep-Security-Smart-Check-Demo/master/code/auto/auto-setup.sh
           chmod +x auto-setup.sh
-          ./auto-setup.sh ${EksCtlClusterName} ${AwsRegion} ${EcrRepo}
+          ./auto-setup.sh ${EksCtlClusterName} ${AwsRegion}
           rm auto-setup.sh
       Tags:
         - Key: Name
@@ -168,12 +166,8 @@ Resources:
           - ec2:DescribeVpcs
           - ec2:DeleteSecurityGroup
           Resource: "*"
-        - Sid: VisualEditor2
-          Effect: Allow
-          Action: ecr:CreateRepository
-          Resource: "*"
 Outputs:
   Ec2InstanceHostname:
     Value: !GetAtt Ec2Instance.PublicDnsName
     Export:
-      Name: !Sub "${AWS::StackName}-Ec2Instance"
+      Name: !Sub "${AWS::StackName}-smartcheck-jumphost"
