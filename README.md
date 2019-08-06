@@ -42,25 +42,18 @@ The *Auto* method is recommended for most users as it is the quickest way to get
 	ParameterKey=AmiId,ParameterValue=<AWS_LINUX2_AMI> \
 	--template-body file://cfn.yml \
 	--capabilities CAPABILITY_IAM
+	```
+	Two CloudFormation templates will be created sequentially. To check the status of the first, use this command:  
 	
+	```
 	aws cloudformation wait stack-create-complete --stack-name <EKSCTL_HOST_CFN>
 	```
+    
+    Once the first template is finished, issue the following command to check the status of the second: 
 
-### Important Note
-
-The EKS cluster can take 20-30 minutes to spin up. You can see the progress of your lab by:
-* Watching the CloudForamtion templates in the AWS console. There will be three in total 
-* Watching the logs of the `smartcheck-host` instance:
 	```
-	sudo tail -f /var/log/messages
+	aws cloudformation wait stack-create-complete --stack-name <EKSCTL_KUBE_CFN>
 	```
-* Checking for Smart Check details:
-	```
-	make get-smart-check-details
-	```
-
-If the above `make` file does not work, wait 10 minutes and try again. Your lab will be ready for use when the Smart Check details become available.
-
 
 ## Manual
 
@@ -126,19 +119,6 @@ If the above `make` file does not work, wait 10 minutes and try again. Your lab 
 	5. Set `Region`.
 	6. Set `Authentication Mode` to `Instance Role`.
 	7. Click *Next* to get started.
-
-6. When you're done, stop the demo:
-
-	```
-	eksctl delete cluster \
-	--name=<CLUSTER_NAME> \
-	--region=<AWS_REGION>
-	
-	make stop \
-	AWS_REGION=<AWS_REGION>
-	```
-
-**Note**: Sometimes the CloudFormation template fails to remove all resources. If this occurs, you'll need to manually delete the Load Balancer and VPC created by the demo.
 
 ## Upload Demo Images (Optional)
 

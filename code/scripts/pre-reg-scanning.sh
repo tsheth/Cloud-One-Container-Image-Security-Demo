@@ -3,7 +3,7 @@ SMARTCHECK_URL=$(kubectl get svc proxy -o jsonpath='{.status.loadBalancer.ingres
 
 cd /tmp
 
-echo 'Generating self-signed certificate for ' $SMARTCHECK_URL
+echo 'Generating self-signed certificate for' $SMARTCHECK_URL
 
 openssl req -x509 -newkey rsa:4096 -sha256 -days 3650 -nodes \
 -keyout dssc.key -out dssc.crt -subj '/CN=example.com' \
@@ -20,7 +20,7 @@ kubectl create secret tls dssc-proxy-certificate \
 --key=dssc.key \
 &>/dev/null
 
-wget https://raw.githubusercontent.com/OzNetNerd/Deep-Security-Smart-Check-Demo/master/code/auto/overrides.yaml &>/dev/null
+wget https://raw.githubusercontent.com/OzNetNerd/Deep-Security-Smart-Check-Demo/master/code/scripts/overrides.yaml &>/dev/null
 
 echo 'Enabling pre-registry scanning'
 
