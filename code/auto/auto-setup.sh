@@ -14,5 +14,7 @@ wget https://raw.githubusercontent.com/OzNetNerd/Deep-Security-Smart-Check-Demo/
 mkdir -p /home/ec2-user/kubernetes-config
 mv ./Makefile /home/ec2-user/kubernetes-config
 cd /home/ec2-user/kubernetes-config
+export PATH=$PATH:/usr/local/bin
+export KUBECONFIG=/home/ec2-user/.kube/config
 make "$3" AWS_REGION="$2"
 chown -R ec2-user:ec2-user /home/ec2-user
