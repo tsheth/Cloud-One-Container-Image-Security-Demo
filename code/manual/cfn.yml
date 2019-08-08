@@ -21,7 +21,7 @@ Resources:
       ImageId: !Ref AmiId
       KeyName: !Ref KeyPair
       SubnetId: !Ref SubnetId
-      InstanceType: t2.micro
+      InstanceType: t2.medium
       SecurityGroupIds:
         - !Ref Ec2InstanceSecurityGroup
       IamInstanceProfile: !Ref EksInstanceProfile
@@ -40,7 +40,7 @@ Resources:
           wget https://raw.githubusercontent.com/OzNetNerd/Deep-Security-Smart-Check-Demo/master/code/scripts/Makefile
           mkdir -p /home/ec2-user/kubernetes-config
           mv ./Makefile /home/ec2-user/kubernetes-config
-          sudo chown -R ec2-user:ec2-user /home/ec2-user
+          chown -R ec2-user:ec2-user /home/ec2-user
       Tags:
         - Key: Name
           Value: smartcheck-jumphost
