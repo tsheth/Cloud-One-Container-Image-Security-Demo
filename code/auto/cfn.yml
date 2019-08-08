@@ -39,7 +39,7 @@ Resources:
           chmod +x auto-setup.sh
           ./auto-setup.sh ${EksCtlClusterName} ${AwsRegion} ${MakefileTarget}
           rm auto-setup.sh
-          sudo chown -R ec2-user:ec2-user /home/ec2-user
+          chown -R ec2-user:ec2-user /home/ec2-user
       Tags:
         - Key: Name
           Value: smartcheck-jumphost
