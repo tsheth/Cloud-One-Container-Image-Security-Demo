@@ -126,14 +126,3 @@ The *Auto* method is recommended for most users as it is the quickest way to get
 make upload-images \
 AWS_REGION=<AWS_REGION>
 ```
-
-## Pre-registry Scanning
-
-To enable pre-registry scanning, run the following commands:
-
-```
-wget https://raw.githubusercontent.com/OzNetNerd/Deep-Security-Smart-Check-Demo/master/code/scripts/pre-reg-scanning.sh
-chmod +x pre-reg-scanning.sh
-./pre-reg-scanning.sh
-rm pre-reg-scanning.sh
-```
