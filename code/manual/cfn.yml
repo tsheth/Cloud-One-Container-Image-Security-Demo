@@ -13,6 +13,9 @@ Parameters:
     Type: AWS::EC2::Subnet::Id
   KeyPair:
     Type: AWS::EC2::KeyPair::KeyName
+  JumphostInstance:
+    Type: String
+    Default: t2.medium
 
 Resources:
   Ec2Instance:
@@ -21,7 +24,7 @@ Resources:
       ImageId: !Ref AmiId
       KeyName: !Ref KeyPair
       SubnetId: !Ref SubnetId
-      InstanceType: t2.medium
+      InstanceType: !Ref JumphostInstance
       SecurityGroupIds:
         - !Ref Ec2InstanceSecurityGroup
       IamInstanceProfile: !Ref EksInstanceProfile

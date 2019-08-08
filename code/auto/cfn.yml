@@ -20,6 +20,9 @@ Parameters:
   MakefileTarget:
     Type: String
     Default: start
+  JumphostInstance:
+    Type: String
+    Default: t2.medium
 
 Resources:
   Ec2Instance:
@@ -28,7 +31,7 @@ Resources:
       ImageId: !Ref AmiId
       KeyName: !Ref KeyPair
       SubnetId: !Ref SubnetId
-      InstanceType: t2.micro
+      InstanceType: !Ref JumphostInstance
       SecurityGroupIds:
         - !Ref Ec2InstanceSecurityGroup
       IamInstanceProfile: !Ref EksInstanceProfile
