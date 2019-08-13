@@ -40,9 +40,12 @@ Resources:
       IamInstanceProfile: !Ref EksInstanceProfile
       UserData:
         Fn::Base64: !Sub |
+          mkdir -p /home/ec2-user
+          cd /home/ec2-user
           wget https://raw.githubusercontent.com/OzNetNerd/Deep-Security-Smart-Check-Demo/master/code/auto/auto.sh
           chmod +x auto.sh
-          /auto.sh ${K8sClusterName} ${AwsRegion}
+          ./auto.sh ${K8sClusterName} ${AwsRegion}
+          chown -R ec2-user:ec2-user /home/ec2-user
       Tags:
         - Key: Name
           Value: smartcheck-jumphost
