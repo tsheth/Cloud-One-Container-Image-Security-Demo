@@ -26,9 +26,6 @@ Parameters:
   K8sClusterName:
     Type: String
     Default: smartcheck-k8s
-  K8sRegion:
-    Type: String
-    Default: ap-southeast-2
 
 Resources:
   Ec2Instance:
@@ -45,7 +42,7 @@ Resources:
         Fn::Base64: !Sub |
           wget https://raw.githubusercontent.com/OzNetNerd/Deep-Security-Smart-Check-Demo/master/code/auto/auto.sh
           chmod +x auto.sh
-          /auto.sh ${K8sClusterName} ${K8sRegion}
+          /auto.sh ${K8sClusterName} ${AwsRegion}
       Tags:
         - Key: Name
           Value: smartcheck-jumphost
