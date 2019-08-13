@@ -9,11 +9,12 @@ curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s htt
 chmod +x ./kubectl
 sudo mv ./kubectl /usr/local/bin/kubectl
 yum install bash-completion --enablerepo=epel -y
-mkdir -p /home/ec2-user
 echo 'source <(kubectl completion bash)' >>/home/ec2-user/.bashrc
 curl https://raw.githubusercontent.com/kubernetes/helm/master/scripts/get > get_helm.sh
 chmod +x get_helm.sh
 ./get_helm.sh
 rm -rf ./get_helm.sh
+eksctl create cluster --name=demo-cluster --nodes=3 --region=ap-southeast-2 --kubeconfig=/home/ec2-user/.kube/config
 helm init
+wget https://raw.githubusercontent.com/OzNetNerd/Deep-Security-Smart-Check-Demo/master/code/scripts/Makefile
 chown -R ec2-user:ec2-user /home/ec2-user
