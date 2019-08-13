@@ -23,6 +23,12 @@ Parameters:
   JumphostInstance:
     Type: String
     Default: t2.medium
+  K8sClusterName:
+    Type: String
+    Default: smartcheck-k8s
+  K8sRegion:
+    Type: String
+    Default: ap-southeast-2
 
 Resources:
   Ec2Instance:
@@ -37,29 +43,9 @@ Resources:
       IamInstanceProfile: !Ref EksInstanceProfile
       UserData:
         Fn::Base64: !Sub |
-          #!/usr/bin/env bash
-          wget https://raw.githubusercontent.com/OzNetNerd/Packer-Gitlab/master/Packer/config/docker-setup.sh
-          sed -e s/"sudo "//g -i docker-setup.sh
-          chmod +x docker-setup.sh
-          ./docker-setup.sh
-          rm docker-setup.sh
-          wget https://raw.githubusercontent.com/OzNetNerd/Deep-Security-Smart-Check-Demo/master/code/scripts/kube-setup.sh
-          chmod +x kube-setup.sh
-          ./kube-setup.sh
-          rm kube-setup.sh
-          mkdir -p /home/ec2-user/.kube
-          eksctl create cluster --name=${EksCtlClusterName} --nodes=3 --region=${AwsRegion} --kubeconfig=/home/ec2-user/.kube/config
-          export KUBECONFIG=/home/ec2-user/.kube/config
-          export PATH=$PATH:/usr/local/bin
-          helm init
-          wget https://raw.githubusercontent.com/OzNetNerd/Deep-Security-Smart-Check-Demo/master/code/scripts/Makefile
-          make ${MakefileTarget}
-          rm Makefile
-          sleep 60
-          wget https://raw.githubusercontent.com/OzNetNerd/Deep-Security-Smart-Check-Demo/master/code/scripts/pre-reg-scanning.sh
-          chmod +x pre-reg-scanning.sh
-          ./pre-reg-scanning.sh
-          chown -R ec2-user:ec2-user /home/ec2-user
+          wget https://raw.githubusercontent.com/OzNetNerd/Deep-Security-Smart-Check-Demo/master/code/auto/auto.sh
+          chmod +x auto.sh
+          /auto.sh ${K8sClusterName} ${K8sRegion}
       Tags:
         - Key: Name
           Value: smartcheck-jumphost
