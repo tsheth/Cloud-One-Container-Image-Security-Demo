@@ -77,8 +77,15 @@ If you'd like to add GitLab CI/CD pipelines to your jumphost, complete the follo
     ```
     wget https://raw.githubusercontent.com/OzNetNerd/Packer-Gitlab/master/CloudFormation/run.sh
     chmod +x run.sh
+    ./run.sh
     ```
-2. Follow the [setup instructions.](https://github.com/OzNetNerd/Packer-Gitlab#setting-up-gitlab)
+2. Change to the `gitlab-config` directory.
+
+    ```
+    cd gitlab-config
+    ```
+
+3. Follow the [setup instructions.](https://github.com/OzNetNerd/Packer-Gitlab#setting-up-gitlab)
 
 ## Troubleshooting
 ### Docker Access
