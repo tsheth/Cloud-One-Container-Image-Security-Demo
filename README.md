@@ -11,7 +11,7 @@ Spin up test environment in order to trial Trend Micro's Smart Check product.
 * Creates an EKS cluster
 * Automatically installs a self-signed certificate and enables [pre-registry scanning](https://github.com/deep-security/smartcheck-helm/wiki/Configure-pre-registry-scanning)
 
-Note: The Smartcheck Jumphost is used to set up the environment as well interact with the Kubernetes cluster.
+**Note:** The Smartcheck Jumphost is used to set up the environment as well interact with the Kubernetes cluster.
 
 ## Instructions
 1. Clone this repo:
