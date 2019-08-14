@@ -104,7 +104,7 @@ Terminate your SSH session and then re-log into the EC2 instance.
 If you forget your Smart Check URL or the default credentials, run the following commands:
 
 ```
-echo Smart Check URI: "$(kubectl get svc proxy -o jsonpath='{.status.loadBalancer.ingress[0].hostname}')"
+echo Smart Check URI: https://"$(kubectl get svc proxy -o jsonpath='{.status.loadBalancer.ingress[0].hostname}')"
 echo Smart Check Username: "$(kubectl get secrets -o jsonpath='{ .data.userName }' deepsecurity-smartcheck-auth | base64 --decode)"
 echo Smart Check Password: "$(kubectl get secrets -o jsonpath='{ .data.password }' deepsecurity-smartcheck-auth | base64 --decode)"
 ```
