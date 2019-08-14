@@ -6,7 +6,7 @@ rm docker-setup.sh
 wget https://raw.githubusercontent.com/OzNetNerd/Deep-Security-Smart-Check-Demo/master/code/scripts/kube-setup.sh
 chmod +x kube-setup.sh
 # k8s CFN name & region
-./kube-setup.sh "$1" "$2"
+./kube-setup.sh "$1" "$2" "$3"
 rm kube-setup.sh
 rm auto.sh
 wget https://raw.githubusercontent.com/OzNetNerd/Deep-Security-Smart-Check-Demo/master/code/scripts/pre-reg-scanning.sh

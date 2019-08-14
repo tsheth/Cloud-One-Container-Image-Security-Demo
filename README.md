@@ -2,7 +2,16 @@
 
 Spin up test environment in order to trial Trend Micro's Smart Check product.
 
-# Instructions
+## Technical Details 
+
+* Creates an EC2 instance with the following security group allowing:
+    * TCP 80 (HTTP)
+    * TCP 22 (SSH) 
+    * TCP 5000 - 5001 (Docker registry)
+* Creates an EKS cluster
+* Automatically installs a self-signed certificate and enables [pre-registry scanning](https://github.com/deep-security/smartcheck-helm/wiki/Configure-pre-registry-scanning)
+
+## Instructions
 1. Clone this repo:
 
 	```
@@ -52,10 +61,14 @@ Spin up test environment in order to trial Trend Micro's Smart Check product.
 
     ```
     ./run.sh smartcheck-eks ap-southeast-2 3
-    ```
+    ``` 
 
-# Troubleshooting
+## Troubleshooting
+### Docker Access
 
+
+
+### Smart Check Credentials
 If the script does not output the Smart Check details, run the following commands:
 
     ```
