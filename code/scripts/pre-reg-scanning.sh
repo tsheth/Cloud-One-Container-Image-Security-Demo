@@ -1,4 +1,5 @@
 #!/bin/bash
+
 SMARTCHECK_URL=$(kubectl get svc proxy -o jsonpath='{.status.loadBalancer.ingress[0].hostname}')
 
 cd /tmp
