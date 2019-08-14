@@ -74,10 +74,10 @@ Spin up test environment in order to trial Trend Micro's Smart Check product.
 ### Smart Check Credentials
 If the script does not output the Smart Check details, run the following commands:
 
-    ```
-    echo ----------------------------------------------------------------------------------------------------------------
-    echo Smart Check URI: "$(kubectl get svc proxy -o jsonpath='{.status.loadBalancer.ingress[0].hostname}')"
-    echo Smart Check Username: "$(kubectl get secrets -o jsonpath='{ .data.userName }' deepsecurity-smartcheck-auth | base64 --decode)"
-    echo Smart Check Password: "$(kubectl get secrets -o jsonpath='{ .data.password }' deepsecurity-smartcheck-auth | base64 --decode)"
-    echo ----------------------------------------------------------------------------------------------------------------
-    ```
+```
+echo ----------------------------------------------------------------------------------------------------------------
+echo Smart Check URI: "$(kubectl get svc proxy -o jsonpath='{.status.loadBalancer.ingress[0].hostname}')"
+echo Smart Check Username: "$(kubectl get secrets -o jsonpath='{ .data.userName }' deepsecurity-smartcheck-auth | base64 --decode)"
+echo Smart Check Password: "$(kubectl get secrets -o jsonpath='{ .data.password }' deepsecurity-smartcheck-auth | base64 --decode)"
+echo ----------------------------------------------------------------------------------------------------------------
+```
