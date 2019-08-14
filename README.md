@@ -4,12 +4,14 @@ Spin up test environment in order to trial Trend Micro's Smart Check product.
 
 ## Technical Details 
 
-* Creates an EC2 instance with the following security group allowing:
+* Creates an EC2 instance (SmartcheckJumphost) with the following security group allowing:
     * TCP 80 (HTTP)
     * TCP 22 (SSH) 
-    * TCP 5000 - 5001 (Docker registry)
+    * TCP 5000 - 5001 (Docker registry) - see the [Smart Check CI/CD pipelines](https://github.com/OzNetNerd/Deep-Security-Smart-Check-Pipeline-GitLab) repo for more information
 * Creates an EKS cluster
 * Automatically installs a self-signed certificate and enables [pre-registry scanning](https://github.com/deep-security/smartcheck-helm/wiki/Configure-pre-registry-scanning)
+
+Note: The Smartcheck Jumphost is used to set up the environment as well interact with the Kubernetes cluster.
 
 ## Instructions
 1. Clone this repo:
@@ -21,10 +23,10 @@ Spin up test environment in order to trial Trend Micro's Smart Check product.
 2. Fill in the parameters for the below, then run the `cfn` template:
 
     Required parameters:
-      * `StackName`: Name of the eksctl node CloudFormation template
-	  * `VpcId`: VPC to launch the eksctl node in
-	  * `SubnetId`: Subnet to launch the eksctl node in
-	  * `KeyPair`: EC2 key for accessing the eksctl node
+      * `StackName`: Name of the Smartcheck Jumphost node CloudFormation template
+	  * `VpcId`: VPC to launch the Smartcheck Jumphost node in
+	  * `SubnetId`: Subnet to launch the Smartcheck Jumphost node in
+	  * `KeyPair`: EC2 key for accessing the Smartcheck Jumphost node
 	  * `AmiId`: AWS AMI ID for Amazon Linux 2 in the specified region
 
     Optional parameters:
@@ -69,10 +71,18 @@ Spin up test environment in order to trial Trend Micro's Smart Check product.
 ## Troubleshooting
 ### Docker Access
 
+If you encounter the following error:
 
+```
+Got permission denied while trying to connect to the Docker daemon socket at unix:///var/run/docker.sock: 
+Get http://%2Fvar%2Frun%2Fdocker.sock/v1.38/containers/json: dial unix /var/run/docker.sock: connect: permission denied
+```
+
+Terminate your SSH session and then re-log into the EC2 instance.
 
 ### Smart Check Credentials
-If the script does not output the Smart Check details, run the following commands:
+
+If you forget your Smart Check URL or the default credentials, run the following commands:
 
 ```
 echo Smart Check URI: "$(kubectl get svc proxy -o jsonpath='{.status.loadBalancer.ingress[0].hostname}')"
