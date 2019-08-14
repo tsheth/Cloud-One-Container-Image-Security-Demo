@@ -43,7 +43,6 @@ Resources:
           cd /home/ec2-user
           wget https://raw.githubusercontent.com/OzNetNerd/Deep-Security-Smart-Check-Demo/master/code/auto/auto.sh
           chmod +x auto.sh
-          ./auto.sh ${EksCtlClusterName} ${AwsRegion}
           chown -R ec2-user:ec2-user /home/ec2-user
       Tags:
         - Key: Name
