@@ -1,5 +1,10 @@
 ---
 Parameters:
+  AwsRegion:
+    Type: String
+  EksCtlClusterName:
+    Type: String
+    Default: dssc-k8s
   AdminIp:
     Type: String
     Default: 0.0.0.0/0
@@ -13,6 +18,9 @@ Parameters:
     Type: AWS::EC2::Subnet::Id
   KeyPair:
     Type: AWS::EC2::KeyPair::KeyName
+  MakefileTarget:
+    Type: String
+    Default: start
   JumphostInstance:
     Type: String
     Default: t2.medium
@@ -30,19 +38,11 @@ Resources:
       IamInstanceProfile: !Ref EksInstanceProfile
       UserData:
         Fn::Base64: !Sub |
-          #!/usr/bin/env bash
-          wget https://raw.githubusercontent.com/OzNetNerd/Packer-Gitlab/master/Packer/config/docker-setup.sh
-          sed -e s/"sudo "//g -i docker-setup.sh
-          chmod +x docker-setup.sh
-          ./docker-setup.sh
-          rm docker-setup.sh
-          wget https://raw.githubusercontent.com/OzNetNerd/Deep-Security-Smart-Check-Demo/master/code/scripts/kube-setup.sh
-          chmod +x kube-setup.sh
-          ./kube-setup.sh
-          rm kube-setup.sh
-          wget https://raw.githubusercontent.com/OzNetNerd/Deep-Security-Smart-Check-Demo/master/code/scripts/Makefile
-          mkdir -p /home/ec2-user/kubernetes-config
-          mv ./Makefile /home/ec2-user/kubernetes-config
+          #!/bin/bash
+          mkdir -p /home/ec2-user
+          cd /home/ec2-user
+          wget https://raw.githubusercontent.com/OzNetNerd/Deep-Security-Smart-Check-Demo/master/code/scripts/run.sh
+          chmod +x run.sh
           chown -R ec2-user:ec2-user /home/ec2-user
       Tags:
         - Key: Name
@@ -57,6 +57,14 @@ Resources:
         FromPort: 22
         ToPort: 22
         CidrIp: !Ref AdminIp
+      - IpProtocol: tcp
+        FromPort: 80
+        ToPort: 80
+        CidrIp: !Ref AdminIp
+      - IpProtocol: tcp
+        FromPort: 5000
+        ToPort: 5001
+        CidrIp: 0.0.0.0/0
       VpcId: !Ref VpcId
 
   EksEc2Role:
@@ -174,12 +182,8 @@ Resources:
           - ec2:DescribeVpcs
           - ec2:DeleteSecurityGroup
           Resource: "*"
-        - Sid: VisualEditor2
-          Effect: Allow
-          Action: ecr:CreateRepository
-          Resource: "*"
 Outputs:
   Ec2InstanceHostname:
     Value: !GetAtt Ec2Instance.PublicDnsName
     Export:
-      Name: !Sub "${AWS::StackName}-Ec2Instance"
+      Name: !Sub "${AWS::StackName}-smartcheck-jumphost"
