@@ -49,7 +49,10 @@ Spin up test environment in order to trial Trend Micro's Smart Check product.
 3. Obtain the hostname of the newly created EC2 instance:
 
     ```
-    aws cloudformation describe-stacks --stack-name <StackName> --query "Stacks[0].Outputs[?OutputKey=='SmartCheckJumphost'].OutputValue" --output text
+    aws cloudformation describe-stacks \
+    --stack-name <StackName> \
+    --query "Stacks[0].Outputs[?OutputKey=='SmartCheckJumphost'].OutputValue" \
+    --output text
     ```
 4. SSH into the jumphost and run the following command:
 
