@@ -11,7 +11,7 @@ Spin up test environment in order to trial Trend Micro's Smart Check product.
 * Creates an EKS cluster
 * Automatically installs a self-signed certificate and enables [pre-registry scanning](https://github.com/deep-security/smartcheck-helm/wiki/Configure-pre-registry-scanning)
 
-**Note:** The Smartcheck Jumphost is used to set up the environment as well interact with the Kubernetes cluster.
+**Note:** The Smartcheck Jumphost is used to set up the environment as well interact with the Kubernetes cluster
 
 ## Instructions
 1. Clone this repo:
@@ -23,10 +23,10 @@ Spin up test environment in order to trial Trend Micro's Smart Check product.
 2. Fill in the parameters for the below, then run the `cfn` template:
 
     Required parameters:
-      * `StackName`: Name of the Smartcheck Jumphost node CloudFormation template
-	  * `VpcId`: VPC to launch the Smartcheck Jumphost node in
-	  * `SubnetId`: Subnet to launch the Smartcheck Jumphost node in
-	  * `KeyPair`: EC2 key for accessing the Smartcheck Jumphost node
+      * `StackName`: Name of the jumphost node CloudFormation template
+	  * `VpcId`: VPC to launch the jumphost node in
+	  * `SubnetId`: Subnet to launch the jumphost node in
+	  * `KeyPair`: EC2 key for accessing the jumphost node
 	  * `AmiId`: AWS AMI ID for Amazon Linux 2 in the specified region
 
     Optional parameters:
@@ -67,6 +67,18 @@ Spin up test environment in order to trial Trend Micro's Smart Check product.
     ```
     ./run.sh smartcheck-eks ap-southeast-2 3
     ``` 
+
+## Gitlab Pipelines
+
+If you'd like to add GitLab CI/CD pipelines to your jumphost, complete the following steps:
+
+1. Download and execute the GitLab setup script:
+
+    ```
+    wget https://raw.githubusercontent.com/OzNetNerd/Packer-Gitlab/master/CloudFormation/run.sh
+    chmod +x run.sh
+    ```
+2. Follow the [setup instructions.](https://github.com/OzNetNerd/Packer-Gitlab#setting-up-gitlab)
 
 ## Troubleshooting
 ### Docker Access
