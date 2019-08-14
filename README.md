@@ -1,4 +1,4 @@
-# Trend Micro Smart Check Demo
+# Deep Security Smart Check Demo
 
 Spin up test environment in order to trial Trend Micro's Smart Check product.
 
@@ -13,15 +13,14 @@ Spin up test environment in order to trial Trend Micro's Smart Check product.
 
     Required parameters:
       * `StackName`: Name of the eksctl node CloudFormation template
-	  * `AwsRegion`: Region to deploy the CloudFormation templates
 	  * `VpcId`: VPC to launch the eksctl node in
 	  * `SubnetId`: Subnet to launch the eksctl node in
 	  * `KeyPair`: EC2 key for accessing the eksctl node
 	  * `AmiId`: AWS AMI ID for Amazon Linux 2 in the specified region
 
     Optional parameters:
-	  * `EksCtlClusterName`: Name of the EKS cluster CloudFormation template
-	  * `AdminIp`: Your public IP
+	  * `AdminIp`: Your public IP (default 0.0.0.0/0)
+	  * `JumphostInstanceSize`: Size of the Smart Check jumphost instance (default t2.micro)
 	 
     Command:
 
@@ -29,12 +28,12 @@ Spin up test environment in order to trial Trend Micro's Smart Check product.
 	cd Deep-Security-Smart-Check-Demo/code
 	
 	aws cloudformation create-stack --stack-name <StackName> \
-	--parameters ParameterKey=EksCtlClusterName,ParameterValue=<EksCtlClusterName> \
-	ParameterKey=AwsRegion,ParameterValue=<AwsRegion> \
 	ParameterKey=VpcId,ParameterValue=<VpcId> \
 	ParameterKey=SubnetId,ParameterValue=<SubnetId> \
 	ParameterKey=KeyPair,ParameterValue=<KeyPair> \
 	ParameterKey=AmiId,ParameterValue=<AmiId> \
+	ParameterKey=AdminIp,ParameterValue=<AdminIp> \
+	ParameterKey=JumphostInstanceSize,ParameterValue=<JumphostInstanceSize> \
 	--template-body file://cfn.yml \
 	--capabilities CAPABILITY_IAM
 	```
@@ -46,7 +45,13 @@ Spin up test environment in order to trial Trend Micro's Smart Check product.
 4. SSH into the jumphost and run the following command:
 
     ```
-    ./run.sh
+    ./run.sh <EKS_STACK_NAME> <AWS_REGION> <NUMBER_OF_NODES>
+    ```
+    
+    e.g:
+
+    ```
+    ./run.sh smartcheck-eks ap-southeast-2 3
     ```
 
 # Troubleshooting

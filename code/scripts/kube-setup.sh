@@ -14,7 +14,7 @@ curl https://raw.githubusercontent.com/kubernetes/helm/master/scripts/get > get_
 chmod +x get_helm.sh
 ./get_helm.sh
 rm -rf ./get_helm.sh
-eksctl create cluster --name=$1 --nodes=3 --region=$2
+eksctl create cluster --name=$1 --region=$2 --nodes=$3
 kubectl create serviceaccount --namespace kube-system tiller
 kubectl create clusterrolebinding tiller-cluster-role --clusterrole=cluster-admin --serviceaccount=kube-system:tiller
 kubectl patch deploy --namespace kube-system tiller-deploy -p '{"spec":{"template":{"spec":{"serviceAccount":"tiller"}}}}'

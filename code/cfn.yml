@@ -1,10 +1,5 @@
 ---
 Parameters:
-  AwsRegion:
-    Type: String
-  EksCtlClusterName:
-    Type: String
-    Default: dssc-k8s
   AdminIp:
     Type: String
     Default: 0.0.0.0/0
@@ -18,9 +13,9 @@ Parameters:
     Type: AWS::EC2::Subnet::Id
   KeyPair:
     Type: AWS::EC2::KeyPair::KeyName
-  JumphostInstance:
+  JumphostInstanceSize:
     Type: String
-    Default: t2.medium
+    Default: t2.micro
 
 Resources:
   Ec2Instance:
@@ -29,7 +24,7 @@ Resources:
       ImageId: !Ref AmiId
       KeyName: !Ref KeyPair
       SubnetId: !Ref SubnetId
-      InstanceType: !Ref JumphostInstance
+      InstanceType: !Ref JumphostInstanceSize
       SecurityGroupIds:
         - !Ref Ec2InstanceSecurityGroup
       IamInstanceProfile: !Ref EksInstanceProfile
