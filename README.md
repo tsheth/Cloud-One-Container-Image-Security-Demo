@@ -24,12 +24,15 @@ Spin up test environment in order to trial Trend Micro's Smart Check product.
 
     Required parameters:
       * `StackName`: Name of the jumphost node CloudFormation template
+      * `AwsRegion`: Region to deploy the Kubernetes cluster
 	  * `VpcId`: VPC to launch the jumphost node in
 	  * `SubnetId`: Subnet to launch the jumphost node in
 	  * `KeyPair`: EC2 key for accessing the jumphost node
 	  * `AmiId`: AWS AMI ID for Amazon Linux 2 in the specified region
 
     Optional parameters:
+	  * `EksClusterName`: Name of the Kubernetes cluster CFN (default smartcheck-k8s)
+	  * `NumberKubeNodes`: Number of Kubernetes worker nodes (default 3)
 	  * `AdminIp`: Your public IP (default 0.0.0.0/0)
 	  * `JumphostInstanceSize`: Size of the Smart Check jumphost instance (default t2.micro)
 	 

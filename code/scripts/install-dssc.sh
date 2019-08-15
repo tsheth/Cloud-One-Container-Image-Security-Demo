@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+helm init
 helm install --set auth.masterPassword=password --name deepsecurity-smartcheck https://github.com/deep-security/smartcheck-helm/archive/master.tar.gz
 sleep 30
 echo ----------------------------------------------------------------------------------------------------------------
