@@ -4,6 +4,7 @@ export KUBECONFIG=/home/ec2-user/.kube/config
 helm init --service-account tiller --home /root/.helm
 sleep 120
 helm install --set auth.masterPassword=password --name deepsecurity-smartcheck https://github.com/deep-security/smartcheck-helm/archive/master.tar.gz  --home /root/.helm
+sleep 300
 wget https://raw.githubusercontent.com/OzNetNerd/Deep-Security-Smart-Check-Demo/master/code/scripts/pre-reg-scanning.sh
 chmod +x pre-reg-scanning.sh
 ./pre-reg-scanning.sh
