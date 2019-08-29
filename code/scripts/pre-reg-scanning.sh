@@ -30,6 +30,7 @@ helm upgrade \
 --values overrides.yaml \
 deepsecurity-smartcheck \
 https://github.com/deep-security/smartcheck-helm/archive/master.tar.gz --reuse-values \
+--home /root/.helm \
 &>/dev/null
 
 echo 'Deleting proxy pod'
