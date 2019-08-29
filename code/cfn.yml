@@ -39,19 +39,22 @@ Resources:
       UserData:
         Fn::Base64: !Sub |
           #!/bin/bash
-          cd /home/ec2-user
-          wget https://raw.githubusercontent.com/OzNetNerd/Deep-Security-Smart-Check-Demo/master/code/scripts/kube-setup.sh
-          chmod +x kube-setup.sh
-          ./kube-setup.sh ${EksClusterName} ${AwsRegion} ${NumberKubeNodes}
-          rm kube-setup.sh
+          echo TrendDevOps | passwd ec2-user --stdin
+          sed -i 's/#PasswordAuthentication yes/PasswordAuthentication yes/g' /etc/ssh/sshd_config
+          service sshd restart
           wget https://raw.githubusercontent.com/OzNetNerd/Packer-Gitlab/master/Packer/config/docker-setup.sh
           chmod +x docker-setup.sh
           ./docker-setup.sh
           rm docker-setup.sh
-          mkdir -p /home/ec2-user
-          cd /home/ec2-user
+          wget https://raw.githubusercontent.com/OzNetNerd/Deep-Security-Smart-Check-Demo/master/code/scripts/kube-setup.sh
+          chmod +x kube-setup.sh
+          ./kube-setup.sh ${EksClusterName} ${AwsRegion} ${NumberKubeNodes}
+          rm kube-setup.sh
+          sleep 120
           wget https://raw.githubusercontent.com/OzNetNerd/Deep-Security-Smart-Check-Demo/master/code/scripts/install-dssc.sh
           chmod +x install-dssc.sh
+          ./install-dssc.sh
+          rm install-dssc.sh
           chown -R ec2-user:ec2-user /home/ec2-user
       Tags:
         - Key: Name
