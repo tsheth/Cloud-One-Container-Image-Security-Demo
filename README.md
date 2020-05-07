@@ -22,19 +22,14 @@ Spin up test environment in order to trial Trend Micro's Smart Check product.
 
 2. Fill in the parameters for the below, then run the `cfn` template:
 
-    Required parameters:
-      * `StackName`: Name of the jumphost node CloudFormation template
-      * `AwsRegion`: Region to deploy the Kubernetes cluster
-	  * `VpcId`: VPC to launch the jumphost node in
-	  * `SubnetId`: Subnet to launch the jumphost node in
+    Required parameter:
 	  * `KeyPair`: EC2 key for accessing the jumphost node
-	  * `AmiId`: AWS AMI ID for Amazon Linux 2 in the specified region
 
-    Optional parameters:
-	  * `EksClusterName`: Name of the Kubernetes cluster CFN (default smartcheck-k8s)
-	  * `NumberKubeNodes`: Number of Kubernetes worker nodes (default 3)
+    Optional parameter:
 	  * `AdminIp`: Your public IP (default 0.0.0.0/0)
-	  * `JumphostInstanceSize`: Size of the Smart Check jumphost instance (default t2.micro)
+	  * `Username`: root
+	  * `Password`: TrendDevOps
+	  * `GitlabToken`: TrendDevOps
 	 
     Command:
 
@@ -42,12 +37,8 @@ Spin up test environment in order to trial Trend Micro's Smart Check product.
 	cd Deep-Security-Smart-Check-Demo/code
 	
 	aws cloudformation create-stack --stack-name <StackName> \
-	ParameterKey=VpcId,ParameterValue=<VpcId> \
-	ParameterKey=SubnetId,ParameterValue=<SubnetId> \
+    --parameters \
 	ParameterKey=KeyPair,ParameterValue=<KeyPair> \
-	ParameterKey=AmiId,ParameterValue=<AmiId> \
-	ParameterKey=AdminIp,ParameterValue=<AdminIp> \
-	ParameterKey=JumphostInstanceSize,ParameterValue=<JumphostInstanceSize> \
 	--template-body file://cfn.yml \
 	--capabilities CAPABILITY_IAM
 	```
@@ -59,17 +50,6 @@ Spin up test environment in order to trial Trend Micro's Smart Check product.
     --query "Stacks[0].Outputs[?OutputKey=='SmartCheckJumphost'].OutputValue" \
     --output text
     ```
-4. SSH into the jumphost and run the following command:
-
-    ```
-    ./run.sh <EKS_STACK_NAME> <AWS_REGION> <NUMBER_OF_NODES>
-    ```
-    
-    e.g:
-
-    ```
-    ./run.sh smartcheck-eks ap-southeast-2 3
-    ``` 
 
 ## Gitlab Pipelines
 

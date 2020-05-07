@@ -1,37 +1,146 @@
 ---
+
+Mappings:
+  AmiRegionMap:
+    ap-east-1:
+      AmiId: "ami-ed9add9c"
+    ap-northeast-1:
+      AmiId: "ami-0c6f9336767cd9243"
+    ap-northeast-2:
+      AmiId: "ami-00aa2a0d003614f3d"
+    ap-northeast-3:
+      AmiId: "ami-0f0d3b24646fd68da"
+    ap-south-1:
+      AmiId: "ami-08c90bce7369e0949"
+    ap-southeast-1:
+      AmiId: "ami-0bb345aaaa7e443e1"
+    ap-southeast-2:
+      AmiId: "ami-055a70ac36a232aeb"
+    ca-central-1:
+      AmiId: "ami-0b7414650236436d0"
+    eu-central-1:
+      AmiId: "ami-0f4734c7a40e8d47e"
+    eu-north-1:
+      AmiId: "ami-02c47a9f0fb1cd87e"
+    eu-west-1:
+      AmiId: "ami-056da6aa694a900ad"
+    eu-west-2:
+      AmiId: "ami-0aea84af8b6a3ed42"
+    eu-west-3:
+      AmiId: "ami-0401407d6841a3a8a"
+    me-south-1:
+      AmiId: "ami-0eacd1fe3347db37a"
+    sa-east-1:
+      AmiId: "ami-0f5f050a5821b9c9c"
+    us-east-1:
+      AmiId: "ami-00b99db251c4b691a"
+    us-east-2:
+      AmiId: "ami-006fa13c7887dc68c"
+    us-west-1:
+      AmiId: "ami-03d58f725e0a129b6"
+    us-west-2:
+      AmiId: "ami-0f1f7576097247b28"
+    cn-north-1:
+      AmiId: "ami-01c6365773222b912"
+
 Parameters:
   NumberKubeNodes:
     Type: Number
     Default: 3
-  AwsRegion:
+  Username:
     Type: String
+    Default: root
+  Password:
+    Type: String
+    Default: TrendDevOps
+  GitlabToken:
+    Type: String
+    Default: TrendDevOps
+
   AdminIp:
     Type: String
     Default: 0.0.0.0/0
-  AmiId:
-    Description: AWS Linux 2 AMI ID
-    Type: AWS::EC2::Image::Id
-  VpcId:
-    Type: AWS::EC2::VPC::Id
-  SubnetId:
-    Description: Subnet ID with public IP addressing
-    Type: AWS::EC2::Subnet::Id
   KeyPair:
     Type: AWS::EC2::KeyPair::KeyName
   EksClusterName:
     Type: String
-    Default: smartcheck-k8s
+    Default: trend-micro-container-security-k8s
   JumphostInstanceSize:
     Type: String
-    Default: t2.micro
+    Default: t2.medium
+  VpcCidr:
+    Type: String
+    Default: 10.0.0.0/16
+  PublicSubnet1Cidr:
+    Type: String
+    Default: 10.0.0.0/24
 
 Resources:
+  Vpc:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: !Ref VpcCidr
+      EnableDnsSupport: true
+      EnableDnsHostnames: true
+      Tags:
+        - Key: Name
+          Value: Trend-Micro-Container-Security-Vpc
+
+  Igw:
+    Type: AWS::EC2::InternetGateway
+    Properties:
+      Tags:
+        - Key: Name
+          Value: Trend-Micro-Container-Security-Igw
+
+  IgwAttachement:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      InternetGatewayId: !Ref Igw
+      VpcId: !Ref Vpc
+
+  PublicSubnet1:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref Vpc
+      AvailabilityZone: !Select [ 0, !GetAZs '' ]
+      CidrBlock: !Ref PublicSubnet1Cidr
+      MapPublicIpOnLaunch: true
+      Tags:
+        - Key: Name
+          Value: Trend-Micro-Container-Security-Public-Subnet-1
+
+  PublicRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref Vpc
+      Tags:
+        - Key: Name
+          Value: Trend-Micro-Container-Security-Public-Route-Table
+
+  DefaultPublicRoute:
+    Type: AWS::EC2::Route
+    DependsOn: IgwAttachement
+    Properties:
+      RouteTableId: !Ref PublicRouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref Igw
+
+  PublicSubnet1RouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref PublicRouteTable
+      SubnetId: !Ref PublicSubnet1
+
   Ec2Instance:
     Type: AWS::EC2::Instance
     Properties:
-      ImageId: !Ref AmiId
+      ImageId: !FindInMap
+        - AmiRegionMap
+        - !Ref 'AWS::Region'
+        - AmiId
       KeyName: !Ref KeyPair
-      SubnetId: !Ref SubnetId
+      SubnetId: !Ref PublicSubnet1
       InstanceType: !Ref JumphostInstanceSize
       SecurityGroupIds:
         - !Ref Ec2InstanceSecurityGroup
@@ -39,31 +148,93 @@ Resources:
       UserData:
         Fn::Base64: !Sub |
           #!/bin/bash
-          echo TrendDevOps | passwd ec2-user --stdin
-          sed -i 's/#PasswordAuthentication yes/PasswordAuthentication yes/g' /etc/ssh/sshd_config
-          service sshd restart
-          wget https://raw.githubusercontent.com/OzNetNerd/Packer-Gitlab/master/Packer/config/docker-setup.sh
-          chmod +x docker-setup.sh
-          ./docker-setup.sh
-          rm docker-setup.sh
-          wget https://raw.githubusercontent.com/OzNetNerd/Deep-Security-Smart-Check-Demo/master/code/scripts/kube-setup.sh
-          chmod +x kube-setup.sh
-          ./kube-setup.sh ${EksClusterName} ${AwsRegion} ${NumberKubeNodes}
-          rm kube-setup.sh
-          sleep 120
-          wget https://raw.githubusercontent.com/OzNetNerd/Deep-Security-Smart-Check-Demo/master/code/scripts/install-dssc.sh
-          chmod +x install-dssc.sh
-          ./install-dssc.sh
-          rm install-dssc.sh
+          wget https://raw.githubusercontent.com/OzNetNerd/Lab-Automation-Scripts/master/Docker/install-docker.sh
+          chmod +x install-docker.sh
+          ./install-docker.sh
+
+          # update to delete install-docker-registry.sh
+          wget https://raw.githubusercontent.com/OzNetNerd/Lab-Automation-Scripts/master/Docker/install-docker-registry.sh
+          chmod +x install-docker-registry.sh
+          REGISTRY_USERNAME=${Username} REGISTRY_PASSWORD=${Password} ./install-docker-registry.sh
+
+          # spin up k8s
+          curl --silent --location "https://github.com/weaveworks/eksctl/releases/download/latest_release/eksctl_$(uname -s)_amd64.tar.gz" | tar xz -C /tmp
+          chmod +x /tmp/eksctl
+          mv /tmp/eksctl /usr/local/bin
+          curl -o aws-iam-authenticator https://amazon-eks.s3-us-west-2.amazonaws.com/1.15.10/2020-02-22/bin/linux/amd64/aws-iam-authenticator
+          chmod +x ./aws-iam-authenticator
+          mv aws-iam-authenticator /usr/local/bin
+          curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl
+          chmod +x ./kubectl
+          mv ./kubectl /usr/local/bin/kubectl
+          mkdir -p /home/ec2-user
+          echo 'source <(kubectl completion bash)' >>/home/ec2-user/.bashrc
+          export PATH=$PATH:/usr/local/bin
+          eksctl create cluster --name=will-eks-manual --region=ap-southeast-2 --nodes=3 --kubeconfig=/home/ec2-user/.kube/config
+          export KUBECONFIG=/home/ec2-user/.kube/config
+          wget https://get.helm.sh/helm-v3.1.2-linux-amd64.tar.gz
+          tar -zxvf helm-v3.1.2-linux-amd64.tar.gz
+          mv linux-amd64/helm /usr/local/bin/helm
+          helm install --set auth.masterPassword=${Password} deepsecurity-smartcheck https://github.com/deep-security/smartcheck-helm/archive/master.tar.gz
+           echo 'Smartcheck is installed. Sleeping to allow it to fully initialize...'
+           sleep 300
+          SMARTCHECK_URL=$(kubectl get svc proxy -o jsonpath='{.status.loadBalancer.ingress[0].hostname}')
+          cd /tmp
+          echo 'Generating self-signed certificate for' $SMARTCHECK_URL
+          openssl req -x509 -newkey rsa:4096 -sha256 -days 3650 -nodes \
+          -keyout dssc.key -out dssc.crt -subj '/CN=example.com' \
+          -extensions san \
+          -config <(echo '[req]'; echo 'distinguished_name=req';
+          echo '[san]'; echo 'subjectAltName=DNS:'$SMARTCHECK_URL) \
+          &>/dev/null
+          echo 'Creating Kubernetes secret: dssc-proxy-certificate'
+          kubectl create secret tls dssc-proxy-certificate \
+          --namespace default \
+          --cert=dssc.crt \
+          --key=dssc.key \
+          &>/dev/null
+          echo 'Enabling pre-registry scanning'
+          helm upgrade \
+          --set auth.masterPassword=${Password} \
+          --set registry.enabled=true \
+          --set registry.auth.username=${Username} \
+          --set registry.auth.password=${Password} \
+          --set certificate.secret.name=dssc-proxy-certificate \
+          --set certificate.secret.certificate=tls.crt \
+          --set certificate.secret.privateKey=tls.key \
+          deepsecurity-smartcheck \
+          https://github.com/deep-security/smartcheck-helm/archive/master.tar.gz
+          echo 'Deleting proxy pod'
+          kubectl delete pods \
+          --namespace default \
+          -l "service=proxy,release=deepsecurity-smartcheck" \
+          &>/dev/null
+          echo Copying Smart Check certificate to /etc/docker/certs.d/$SMARTCHECK_URL\:5000/ca.crt
+          kubectl get secret dssc-proxy-certificate -o go-template='{{index .data "tls.crt" | base64decode}}' >  ca.crt
+          mkdir -p /etc/docker/certs.d/$SMARTCHECK_URL\:5000/
+          mv ca.crt /etc/docker/certs.d/$SMARTCHECK_URL\:5000/ca.crt
           chown -R ec2-user:ec2-user /home/ec2-user
+
+          # set up GitLab
+          wget https://raw.githubusercontent.com/OzNetNerd/Lab-Automation-Scripts/master/Gitlab/install-gitlab.sh
+          chmod +x install-gitlab.sh
+          GITLAB_PASSWORD=${Password} GITLAB_TOKEN=${GitlabToken} ./install-gitlab.sh
+
+          # Get credentials
+          echo ----------------------------------------------------------------------------------------------------------------
+          echo Smart Check URI: https://"$(kubectl get svc proxy -o jsonpath='{.status.loadBalancer.ingress[0].hostname}')"
+          echo Smart Check Username: "$(kubectl get secrets -o jsonpath='{ .data.userName }' deepsecurity-smartcheck-auth | base64 --decode)"
+          echo Smart Check Password: "$(kubectl get secrets -o jsonpath='{ .data.password }' deepsecurity-smartcheck-auth | base64 --decode)"
+          echo ----------------------------------------------------------------------------------------------------------------
+
       Tags:
         - Key: Name
-          Value: SmartCheckJumphost
+          Value: Trend-Micro-Container-Security
 
   Ec2InstanceSecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
-      GroupDescription: Allow access to the Smart Check jumpbox
+      GroupDescription: Allow access to the Container Security jumpbox
       SecurityGroupIngress:
       - IpProtocol: tcp
         FromPort: 22
@@ -75,13 +246,15 @@ Resources:
         CidrIp: !Ref AdminIp
       - IpProtocol: tcp
         FromPort: 5000
-        ToPort: 5001
+        ToPort: 5000
         CidrIp: 0.0.0.0/0
-      VpcId: !Ref VpcId
+      VpcId: !Ref Vpc
 
   EksEc2Role:
     Type: AWS::IAM::Role
     Properties:
+      ManagedPolicyArns:
+        - "arn:aws:iam::aws:policy/AdministratorAccess"
       AssumeRolePolicyDocument:
         Version: "2012-10-17"
         Statement:
@@ -99,103 +272,8 @@ Resources:
       Roles:
         - !Ref EksEc2Role
 
-  EksEc2Policy:
-    Type: AWS::IAM::Policy
-    Properties:
-      PolicyName: 'eksctl'
-      Roles:
-        - !Ref EksEc2Role
-      PolicyDocument:
-        Version: '2012-10-17'
-        Statement:
-        - Sid: VisualEditor0
-          Effect: Allow
-          Action:
-          - iam:CreateInstanceProfile
-          - iam:DeleteInstanceProfile
-          - iam:GetRole
-          - iam:GetInstanceProfile
-          - iam:RemoveRoleFromInstanceProfile
-          - iam:CreateRole
-          - iam:DeleteRole
-          - iam:AttachRolePolicy
-          - iam:PutRolePolicy
-          - iam:ListInstanceProfiles
-          - iam:AddRoleToInstanceProfile
-          - iam:ListInstanceProfilesForRole
-          - iam:PassRole
-          - iam:CreateServiceLinkedRole
-          - iam:DetachRolePolicy
-          - iam:DeleteRolePolicy
-          - iam:DeleteServiceLinkedRole
-          - ec2:DeleteInternetGateway
-          - iam:GetRolePolicy
-          Resource:
-          - !Sub 'arn:aws:iam::${AWS::AccountId}:role/eksctl-*'
-          - !Sub 'arn:aws:iam::${AWS::AccountId}:instance-profile/eksctl-*'
-          - arn:aws:ec2:*:*:internet-gateway/*
-        - Sid: VisualEditor1
-          Effect: Allow
-          Action:
-          - ec2:AuthorizeSecurityGroupIngress
-          - ec2:DeleteSubnet
-          - ec2:AttachInternetGateway
-          - ec2:DeleteRouteTable
-          - ec2:AssociateRouteTable
-          - ec2:DescribeInternetGateways
-          - ec2:CreateRoute
-          - ec2:CreateInternetGateway
-          - ec2:RevokeSecurityGroupEgress
-          - autoscaling:DescribeAutoScalingGroups
-          - autoscaling:UpdateAutoScalingGroup
-          - ec2:DeleteInternetGateway
-          - ec2:DescribeKeyPairs
-          - ec2:DescribeRouteTables
-          - ec2:ImportKeyPair
-          - ec2:DescribeLaunchTemplates
-          - ec2:CreateTags
-          - ec2:CreateRouteTable
-          - ec2:RunInstances
-          - cloudformation:*
-          - ec2:DetachInternetGateway
-          - ec2:DisassociateRouteTable
-          - ec2:RevokeSecurityGroupIngress
-          - ec2:DescribeImageAttribute
-          - ec2:DeleteNatGateway
-          - ec2:DeleteVpc
-          - autoscaling:DeleteAutoScalingGroup
-          - ec2:CreateSubnet
-          - ec2:DescribeSubnets
-          - eks:*
-          - autoscaling:CreateAutoScalingGroup
-          - ec2:DescribeAddresses
-          - ec2:DeleteTags
-          - ec2:CreateNatGateway
-          - autoscaling:DescribeLaunchConfigurations
-          - ec2:CreateVpc
-          - ec2:DescribeVpcAttribute
-          - ec2:DescribeAvailabilityZones
-          - autoscaling:DescribeScalingActivities
-          - ec2:CreateSecurityGroup
-          - ec2:ModifyVpcAttribute
-          - ec2:ReleaseAddress
-          - ec2:AuthorizeSecurityGroupEgress
-          - ec2:DeleteLaunchTemplate
-          - ec2:DescribeTags
-          - ec2:DeleteRoute
-          - ec2:DescribeLaunchTemplateVersions
-          - ec2:DescribeNatGateways
-          - ec2:AllocateAddress
-          - ec2:DescribeSecurityGroups
-          - ec2:DescribeImages
-          - autoscaling:CreateLaunchConfiguration
-          - ec2:CreateLaunchTemplate
-          - autoscaling:DeleteLaunchConfiguration
-          - ec2:DescribeVpcs
-          - ec2:DeleteSecurityGroup
-          Resource: "*"
 Outputs:
-  SmartCheckJumphost:
+  ContainerSecurityJumphost:
     Value: !GetAtt Ec2Instance.PublicDnsName
     Export:
-      Name: !Sub "${AWS::StackName}-SmartCheckJumphost"
+      Name: !Sub "${AWS::StackName}-TrendMicroContainerSecurityJumphost"
