@@ -13,14 +13,14 @@ kubectl create secret tls dssc-proxy-certificate \
 --key=dssc.key
 echo 'Enabling pre-registry scanning'
 helm upgrade \
---set auth.masterPassword=$PASSWORD \
+--set auth.secretSeed=$DEFAULT_PASSWORD \
+--set auth.password=$DEFAULT_PASSWORD \
 --set registry.enabled=true \
---set registry.auth.username=$USERNAME \
---set registry.auth.password=$PASSWORD \
+--set registry.auth.username=$REGISTRY_UESRNAME \
+--set registry.auth.password=$REGISTRY_PASSWORD \
 --set certificate.secret.name=dssc-proxy-certificate \
 --set certificate.secret.certificate=tls.crt \
 --set certificate.secret.privateKey=tls.key \
---set auth.secretSeed=$PASSWORD \
 deepsecurity-smartcheck \
 https://github.com/deep-security/smartcheck-helm/archive/master.tar.gz
 echo 'Deleting proxy pod'
