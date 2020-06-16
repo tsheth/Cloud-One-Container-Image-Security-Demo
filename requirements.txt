@@ -1,0 +1,4 @@
+boto3
+pyyaml
+onnmisc==0.0.10
+netmiko
