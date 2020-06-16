@@ -1,97 +1,85 @@
 ---
-
-Mappings:
-  AmiRegionMap:
-    ap-east-1:
-      AmiId: "ami-ed9add9c"
-    ap-northeast-1:
-      AmiId: "ami-0c6f9336767cd9243"
-    ap-northeast-2:
-      AmiId: "ami-00aa2a0d003614f3d"
-    ap-northeast-3:
-      AmiId: "ami-0f0d3b24646fd68da"
-    ap-south-1:
-      AmiId: "ami-08c90bce7369e0949"
-    ap-southeast-1:
-      AmiId: "ami-0bb345aaaa7e443e1"
-    ap-southeast-2:
-      AmiId: "ami-055a70ac36a232aeb"
-    ca-central-1:
-      AmiId: "ami-0b7414650236436d0"
-    eu-central-1:
-      AmiId: "ami-0f4734c7a40e8d47e"
-    eu-north-1:
-      AmiId: "ami-02c47a9f0fb1cd87e"
-    eu-west-1:
-      AmiId: "ami-056da6aa694a900ad"
-    eu-west-2:
-      AmiId: "ami-0aea84af8b6a3ed42"
-    eu-west-3:
-      AmiId: "ami-0401407d6841a3a8a"
-    me-south-1:
-      AmiId: "ami-0eacd1fe3347db37a"
-    sa-east-1:
-      AmiId: "ami-0f5f050a5821b9c9c"
-    us-east-1:
-      AmiId: "ami-00b99db251c4b691a"
-    us-east-2:
-      AmiId: "ami-006fa13c7887dc68c"
-    us-west-1:
-      AmiId: "ami-03d58f725e0a129b6"
-    us-west-2:
-      AmiId: "ami-0f1f7576097247b28"
-    cn-north-1:
-      AmiId: "ami-01c6365773222b912"
+AWSTemplateFormatVersion: "2010-09-09"
+Description: "Trend Micro Container Image Security demo environment"
 
 Parameters:
-  NumberKubeNodes:
-    Type: Number
-    Default: 3
-  Username:
-    Type: String
-    Default: root
-  Password:
-    Type: String
-    Default: TrendDevOps
-  GitlabToken:
-    Type: String
-    Default: TrendDevOps
+  CisHostname:
+    Type: "String"
+    Description: "Container Image Security hostname"
 
-  AdminIp:
-    Type: String
-    Default: 0.0.0.0/0
-  KeyPair:
-    Type: AWS::EC2::KeyPair::KeyName
-  EksClusterName:
-    Type: String
-    Default: trend-micro-container-security-k8s
+  CisGuiUsername:
+    Type: "String"
+    Default: "administrator"
+    Description: "Container Image Security GUI username"
+
+  CisGuiPassword:
+    Type: "String"
+    NoEcho: "true"
+    Description: "Container Image Security GUI password"
+
+  CisRegistryUsername:
+    Type: "String"
+    Default: "registry"
+    Description: "Container Image Security pre-registry username"
+
+  CisRegistryPassword:
+    Type: "String"
+    Default: "password"
+    NoEcho: "true"
+    Description: "Container Image Security pre-registry password"
+
+  CisPublicCertificate:
+    Type: "String"
+
+  BranchName:
+    Type: "String"
+    Default: "master"
+
+  PipelineName:
+    Type: "String"
+    Default: "Trend-Container-Image-Security"
+
+  CodeCommitRepoName:
+    Type: "String"
+    Default: "DemoApp"
+
+  EcrRepoName:
+    Type: "String"
+    Description: "Container image name. Note: MUST BE LOWER CASE."
+    Default: "demoapp"
+
+  ArtifactBucketName:
+    Type: "String"
+
   JumphostInstanceSize:
-    Type: String
-    Default: t2.medium
+    Type: "String"
+    Default: "t2.medium"
+
   VpcCidr:
-    Type: String
-    Default: 10.0.0.0/16
+    Type: "String"
+    Default: "10.0.0.0/16"
+
   PublicSubnet1Cidr:
-    Type: String
-    Default: 10.0.0.0/24
+    Type: "String"
+    Default: "10.0.0.0/24"
 
 Resources:
   Vpc:
     Type: AWS::EC2::VPC
     Properties:
       CidrBlock: !Ref VpcCidr
-      EnableDnsSupport: true
-      EnableDnsHostnames: true
+      EnableDnsSupport: "true"
+      EnableDnsHostnames: "true"
       Tags:
-        - Key: Name
-          Value: Trend-Micro-Container-Security-Vpc
+        - Key: "Name"
+          Value: "Trend-Micro-Demo-Vpc"
 
   Igw:
     Type: AWS::EC2::InternetGateway
     Properties:
       Tags:
-        - Key: Name
-          Value: Trend-Micro-Container-Security-Igw
+        - Key: "Name"
+          Value: "Trend-Micro-Demo-Igw"
 
   IgwAttachement:
     Type: AWS::EC2::VPCGatewayAttachment
@@ -105,25 +93,25 @@ Resources:
       VpcId: !Ref Vpc
       AvailabilityZone: !Select [ 0, !GetAZs '' ]
       CidrBlock: !Ref PublicSubnet1Cidr
-      MapPublicIpOnLaunch: true
+      MapPublicIpOnLaunch: "true"
       Tags:
-        - Key: Name
-          Value: Trend-Micro-Container-Security-Public-Subnet-1
+        - Key: "Name"
+          Value: "Trend-Micro-Demo-Public-Subnet-1"
 
   PublicRouteTable:
     Type: AWS::EC2::RouteTable
     Properties:
       VpcId: !Ref Vpc
       Tags:
-        - Key: Name
-          Value: Trend-Micro-Container-Security-Public-Route-Table
+        - Key: "Name"
+          Value: "Trend-Micro-Demo-Public-Route-Table"
 
   DefaultPublicRoute:
     Type: AWS::EC2::Route
-    DependsOn: IgwAttachement
+    DependsOn: "IgwAttachement"
     Properties:
       RouteTableId: !Ref PublicRouteTable
-      DestinationCidrBlock: 0.0.0.0/0
+      DestinationCidrBlock: "0.0.0.0/0"
       GatewayId: !Ref Igw
 
   PublicSubnet1RouteTableAssociation:
@@ -132,148 +120,276 @@ Resources:
       RouteTableId: !Ref PublicRouteTable
       SubnetId: !Ref PublicSubnet1
 
-  Ec2Instance:
-    Type: AWS::EC2::Instance
+  PipelineArtifactsBucket:
+    Type: AWS::S3::Bucket
     Properties:
-      ImageId: !FindInMap
-        - AmiRegionMap
-        - !Ref 'AWS::Region'
-        - AmiId
-      KeyName: !Ref KeyPair
-      SubnetId: !Ref PublicSubnet1
-      InstanceType: !Ref JumphostInstanceSize
-      SecurityGroupIds:
-        - !Ref Ec2InstanceSecurityGroup
-      IamInstanceProfile: !Ref EksInstanceProfile
-      UserData:
-        Fn::Base64: !Sub |
-          #!/bin/bash
-          wget https://raw.githubusercontent.com/OzNetNerd/Lab-Automation-Scripts/master/Docker/install-docker.sh
-          chmod +x install-docker.sh
-          ./install-docker.sh
+      BucketName: !Ref ArtifactBucketName
 
-          # update to delete install-docker-registry.sh
-          wget https://raw.githubusercontent.com/OzNetNerd/Lab-Automation-Scripts/master/Docker/install-docker-registry.sh
-          chmod +x install-docker-registry.sh
-          REGISTRY_USERNAME=${Username} REGISTRY_PASSWORD=${Password} ./install-docker-registry.sh
+  CodeCommitRepo:
+    Type: "AWS::CodeCommit::Repository"
+    Properties:
+      RepositoryName: !Ref CodeCommitRepoName
+      RepositoryDescription: "CodeCommit Repository"
 
-          # spin up k8s
-          curl --silent --location "https://github.com/weaveworks/eksctl/releases/download/latest_release/eksctl_$(uname -s)_amd64.tar.gz" | tar xz -C /tmp
-          chmod +x /tmp/eksctl
-          mv /tmp/eksctl /usr/local/bin
-          curl -o aws-iam-authenticator https://amazon-eks.s3-us-west-2.amazonaws.com/1.15.10/2020-02-22/bin/linux/amd64/aws-iam-authenticator
-          chmod +x ./aws-iam-authenticator
-          mv aws-iam-authenticator /usr/local/bin
-          curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl
-          chmod +x ./kubectl
-          mv ./kubectl /usr/local/bin/kubectl
-          mkdir -p /home/ec2-user
-          echo 'source <(kubectl completion bash)' >>/home/ec2-user/.bashrc
-          export PATH=$PATH:/usr/local/bin
-          eksctl create cluster --name=will-eks-manual --region=ap-southeast-2 --nodes=3 --kubeconfig=/home/ec2-user/.kube/config
-          export KUBECONFIG=/home/ec2-user/.kube/config
-          wget https://get.helm.sh/helm-v3.1.2-linux-amd64.tar.gz
-          tar -zxvf helm-v3.1.2-linux-amd64.tar.gz
-          mv linux-amd64/helm /usr/local/bin/helm
-          helm install --set auth.masterPassword=${Password} deepsecurity-smartcheck https://github.com/deep-security/smartcheck-helm/archive/master.tar.gz
-           echo 'Smartcheck is installed. Sleeping to allow it to fully initialize...'
-           sleep 300
-          SMARTCHECK_URL=$(kubectl get svc proxy -o jsonpath='{.status.loadBalancer.ingress[0].hostname}')
-          cd /tmp
-          echo 'Generating self-signed certificate for' $SMARTCHECK_URL
-          openssl req -x509 -newkey rsa:4096 -sha256 -days 3650 -nodes \
-          -keyout dssc.key -out dssc.crt -subj '/CN=example.com' \
-          -extensions san \
-          -config <(echo '[req]'; echo 'distinguished_name=req';
-          echo '[san]'; echo 'subjectAltName=DNS:'$SMARTCHECK_URL) \
-          &>/dev/null
-          echo 'Creating Kubernetes secret: dssc-proxy-certificate'
-          kubectl create secret tls dssc-proxy-certificate \
-          --namespace default \
-          --cert=dssc.crt \
-          --key=dssc.key \
-          &>/dev/null
-          echo 'Enabling pre-registry scanning'
-          helm upgrade \
-          --set auth.masterPassword=${Password} \
-          --set registry.enabled=true \
-          --set registry.auth.username=${Username} \
-          --set registry.auth.password=${Password} \
-          --set certificate.secret.name=dssc-proxy-certificate \
-          --set certificate.secret.certificate=tls.crt \
-          --set certificate.secret.privateKey=tls.key \
-          deepsecurity-smartcheck \
-          https://github.com/deep-security/smartcheck-helm/archive/master.tar.gz
-          echo 'Deleting proxy pod'
-          kubectl delete pods \
-          --namespace default \
-          -l "service=proxy,release=deepsecurity-smartcheck" \
-          &>/dev/null
-          echo Copying Smart Check certificate to /etc/docker/certs.d/$SMARTCHECK_URL\:5000/ca.crt
-          kubectl get secret dssc-proxy-certificate -o go-template='{{index .data "tls.crt" | base64decode}}' >  ca.crt
-          mkdir -p /etc/docker/certs.d/$SMARTCHECK_URL\:5000/
-          mv ca.crt /etc/docker/certs.d/$SMARTCHECK_URL\:5000/ca.crt
-          chown -R ec2-user:ec2-user /home/ec2-user
+  CiCidPipeline:
+    Type: AWS::CodePipeline::Pipeline
+    Properties:
+      Name: !Ref PipelineName
+      ArtifactStore:
+        Type: "S3"
+        Location: !Ref ArtifactBucketName
+      RoleArn: !GetAtt CiCidPipelineRole.Arn
+      Stages:
+        - Name: "Source"
+          Actions:
+            - Name: "Source"
+              ActionTypeId:
+                Category: "Source"
+                Owner: "AWS"
+                Version: "1"
+                Provider: "CodeCommit"
+              OutputArtifacts:
+                - Name: "AppCode"
+              Configuration:
+                BranchName: !Ref BranchName
+                PollForSourceChanges: "false"
+                RepositoryName: !Ref CodeCommitRepoName
+              RunOrder: "1"
 
-          # set up GitLab
-          wget https://raw.githubusercontent.com/OzNetNerd/Lab-Automation-Scripts/master/Gitlab/install-gitlab.sh
-          chmod +x install-gitlab.sh
-          GITLAB_PASSWORD=${Password} GITLAB_TOKEN=${GitlabToken} ./install-gitlab.sh
-
-          # Get credentials
-          echo ----------------------------------------------------------------------------------------------------------------
-          echo Smart Check URI: https://"$(kubectl get svc proxy -o jsonpath='{.status.loadBalancer.ingress[0].hostname}')"
-          echo Smart Check Username: "$(kubectl get secrets -o jsonpath='{ .data.userName }' deepsecurity-smartcheck-auth | base64 --decode)"
-          echo Smart Check Password: "$(kubectl get secrets -o jsonpath='{ .data.password }' deepsecurity-smartcheck-auth | base64 --decode)"
-          echo ----------------------------------------------------------------------------------------------------------------
-
+        - Name: "Build"
+          Actions:
+            - Name: "Build"
+              ActionTypeId:
+                Category: "Build"
+                Owner: "AWS"
+                Version: "1"
+                Provider: "CodeBuild"
+              Configuration:
+                ProjectName: !Ref CodeBuildProject
+              InputArtifacts:
+                - Name: "AppCode"
+              OutputArtifacts:
+                - Name: "BuildOutput"
+              RunOrder: "1"
       Tags:
-        - Key: Name
-          Value: Trend-Micro-Container-Security
+        - Key: "Name"
+          Value: !Ref PipelineName
 
-  Ec2InstanceSecurityGroup:
-    Type: AWS::EC2::SecurityGroup
-    Properties:
-      GroupDescription: Allow access to the Container Security jumpbox
-      SecurityGroupIngress:
-      - IpProtocol: tcp
-        FromPort: 22
-        ToPort: 22
-        CidrIp: !Ref AdminIp
-      - IpProtocol: tcp
-        FromPort: 80
-        ToPort: 80
-        CidrIp: !Ref AdminIp
-      - IpProtocol: tcp
-        FromPort: 5000
-        ToPort: 5000
-        CidrIp: 0.0.0.0/0
-      VpcId: !Ref Vpc
-
-  EksEc2Role:
+  CiCidPipelineRole:
     Type: AWS::IAM::Role
     Properties:
-      ManagedPolicyArns:
-        - "arn:aws:iam::aws:policy/AdministratorAccess"
       AssumeRolePolicyDocument:
-        Version: "2012-10-17"
         Statement:
-          - Effect: "Allow"
+        - Effect: "Allow"
+          Principal:
+            Service:
+            - "codepipeline.amazonaws.com"
+          Action:
+          - "sts:AssumeRole"
+      Path: "/"
+      Policies:
+      - PolicyName: "root"
+        PolicyDocument:
+          Version: "2012-10-17"
+          Statement:
+          - Action:
+            - "codecommit:GetBranch"
+            - "codecommit:GetCommit"
+            - "codecommit:UploadArchive"
+            - "codecommit:GetUploadArchiveStatus"
+            - "codecommit:CancelUploadArchive"
+            Resource: !Sub "arn:aws:codecommit:${AWS::Region}:${AWS::AccountId}:${CodeCommitRepoName}"
+            Effect: "Allow"
+          - Action:
+            - "s3:GetObject"
+            - "s3:GetObjectVersion"
+            - "s3:GetBucketVersioning"
+            - "s3:PutObject"
+            Resource:
+              - !Sub "arn:aws:s3:::${ArtifactBucketName}/*"
+            Effect: "Allow"
+          - Action:
+            - "codebuild:StartBuild"
+            - "codebuild:BatchGetBuilds"
+            - "iam:PassRole"
+            Resource: "*"
+            Effect: "Allow"
+
+  CodeBuildProject:
+    Type: AWS::CodeBuild::Project
+    Properties:
+      Artifacts:
+        Type: "CODEPIPELINE"
+      Description: "Create Docker image"
+      Environment:
+        Type: "LINUX_CONTAINER"
+        Image: "aws/codebuild/amazonlinux2-x86_64-standard:3.0"
+        ComputeType: "BUILD_GENERAL1_SMALL"
+        PrivilegedMode: "true"
+        EnvironmentVariables:
+          - Name: "CIS_PUBLIC_CERTIFICATE"
+            Value: !Ref CisPublicCertificate
+          - Name: "CIS_HOSTNAME"
+            Value: !Ref CisHostname
+          - Name: "CIS_GUI_USERNAME"
+            Value: !Ref CisGuiUsername
+          - Name: "TREND_CIS_GUI_PASSWORD"
+            Value: "TREND_CIS_GUI_PASSWORD"
+            Type: "SECRETS_MANAGER"
+          - Name: "PRE_REGISTRY_USERNAME"
+            Value: !Ref CisRegistryUsername
+          - Name: "TREND_PRE_REGISTRY_PASSWORD"
+            Value: "TREND_PRE_REGISTRY_PASSWORD"
+            Type: "SECRETS_MANAGER"
+          - Name: "AWS_DEFAULT_REGION"
+            Value: !Ref AWS::Region
+          - Name: "AWS_ACCOUNT_ID"
+            Value: !Ref AWS::AccountId
+          - Name: "IMAGE_REPO_NAME"
+            Value: !Ref EcrRepoName
+          - Name: "IMAGE_TAG"
+            Value: "latest"
+      Name: "DockerImagePipeline"
+      ServiceRole: !GetAtt CodeBuildServiceRole.Arn
+      Source:
+        Type: "CODEPIPELINE"
+        BuildSpec: |
+          version: 0.1
+          phases:
+            pre_build:
+              commands:
+                - echo Adding Container Image Security public certificate to the list of trusted registries...
+                - mkdir -p /etc/docker/certs.d/$CIS_HOSTNAME:5000
+                - echo $CIS_PUBLIC_CERTIFICATE | base64 -d > /etc/docker/certs.d/$CIS_HOSTNAME:5000/ca.crt
+                - echo Logging in to Amazon ECR...
+                - $(aws ecr get-login --no-include-email --region $AWS_DEFAULT_REGION)
+            build:
+              commands:
+                - echo Build started on `date`
+                - echo Building the Docker image...
+                - docker build -t $IMAGE_REPO_NAME:$IMAGE_TAG .
+                - docker tag $IMAGE_REPO_NAME:$IMAGE_TAG $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME:$IMAGE_TAG
+                - echo Scanning image...
+                - >-
+                    docker run -v /var/run/docker.sock:/var/run/docker.sock
+                    deepsecurity/smartcheck-scan-action
+                    --image-name $IMAGE_REPO_NAME:$IMAGE_TAG
+                    --smartcheck-host=$CIS_HOSTNAME
+                    --smartcheck-user=$CIS_GUI_USERNAME
+                    --smartcheck-password=$TREND_CIS_GUI_PASSWORD
+                    --insecure-skip-tls-verify
+                    --insecure-skip-registry-tls-verify
+                    --preregistry-scan
+                    --preregistry-user $PRE_REGISTRY_USERNAME
+                    --preregistry-password $TREND_PRE_REGISTRY_PASSWORD
+            post_build:
+              commands:
+                - bash -c "if [ /"$CODEBUILD_BUILD_SUCCEEDING/" == /"0/" ]; then exit 1; fi"
+                - echo Build completed on `date`
+                - echo Pushing the Docker image...
+                - docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME:$IMAGE_TAG
+#      Tags:
+#        - Tag
+
+  EcrRepository:
+    Type: AWS::ECR::Repository
+    Properties:
+      RepositoryName: !Ref EcrRepoName
+#      Tags:
+#        - Tag
+
+  CodeBuildServiceRole:
+    Type: AWS::IAM::Role
+    Properties:
+      Path: "/"
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
             Principal:
               Service:
-                - "ec2.amazonaws.com"
-            Action:
-              - "sts:AssumeRole"
+                - "codebuild.amazonaws.com"
+                - "events.amazonaws.com"
+            Action: "sts:AssumeRole"
+      Policies:
+        - PolicyName: "ServiceRole"
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Resource: "*"
+                Effect: "Allow"
+                Action:
+                  - "logs:CreateLogGroup"
+                  - "logs:CreateLogStream"
+                  - "logs:PutLogEvents"
+                  - "ecr:GetAuthorizationToken"
+              - Effect: "Allow"
+                Resource:
+                  - !Sub arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:TREND_CIS_GUI_PASSWORD-*
+                  - !Sub arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:TREND_PRE_REGISTRY_PASSWORD-*
+                Action: "secretsmanager:GetSecretValue"
+              - Resource: !Sub "arn:aws:s3:::${ArtifactBucketName}/*"
+                Effect: "Allow"
+                Action:
+                  - "s3:GetObject"
+                  - "s3:PutObject"
+                  - "s3:GetObjectVersion"
+              - Resource: !Sub "arn:aws:ecr:${AWS::Region}:${AWS::AccountId}:repository/${EcrRepoName}"
+                Effect: Allow
+                Action:
+                  - "ecr:GetDownloadUrlForLayer"
+                  - "ecr:BatchGetImage"
+                  - "ecr:BatchCheckLayerAvailability"
+                  - "ecr:PutImage"
+                  - "ecr:InitiateLayerUpload"
+                  - "ecr:UploadLayerPart"
+                  - "ecr:CompleteLayerUpload"
+              - Resource: !Sub "arn:aws:codepipeline:${AWS::Region}:${AWS::AccountId}:${PipelineName}"
+                Effect: "Allow"
+                Action: "codepipeline:StartPipelineExecution"
 
-  EksInstanceProfile:
-    Type: AWS::IAM::InstanceProfile
+  CodeCommitEventRule:
+    Type: AWS::Events::Rule
     Properties:
-      Path: /
-      Roles:
-        - !Ref EksEc2Role
+      Name: "PipelineTrigger"
+      EventPattern:
+        source:
+          - "aws.codecommit"
+        detail-type:
+          - "CodeCommit Repository State Change"
+        resources:
+          - !GetAtt CodeCommitRepo.Arn
+        detail:
+          event:
+            - "referenceCreated"
+            - "referenceUpdated"
+          referenceType:
+            - "branch"
+          referenceName:
+            - !Ref BranchName
+      Targets:
+        - Arn: !Sub "arn:aws:codepipeline:${AWS::Region}:${AWS::AccountId}:${PipelineName}"
+          RoleArn: !GetAtt CodeBuildServiceRole.Arn
+          Id: !Sub "codepipeline-${PipelineName}"
+
+  Cloud9Host:
+    Type: AWS::Cloud9::EnvironmentEC2
+    Properties:
+      Description: "Container Image Security IDE used to create & modify a Dockerfile"
+      InstanceType: !Ref JumphostInstanceSize
+      Name: "Trend-Container-Image-Security-IDE"
+      Repositories:
+          - RepositoryUrl: !Sub "https://git-codecommit.${AWS::Region}.amazonaws.com/v1/repos/${CodeCommitRepoName}"
+            PathComponent: !Sub "/${CodeCommitRepoName}"
+      SubnetId: !Ref PublicSubnet1
 
 Outputs:
-  ContainerSecurityJumphost:
-    Value: !GetAtt Ec2Instance.PublicDnsName
-    Export:
-      Name: !Sub "${AWS::StackName}-TrendMicroContainerSecurityJumphost"
+  CloneUrlHttp:
+    Description: "CodeCommit HTTP URL"
+    Value: !GetAtt CodeCommitRepo.CloneUrlHttp
+  CloneUrlSsh:
+    Description: "CodeCommit SSH URL"
+    Value: !GetAtt CodeCommitRepo.CloneUrlSsh
+  Cloud9Url:
+    Description: "Cloud9 Environment"
+    Value: !Sub "https://${AWS::Region}.console.aws.amazon.com/cloud9/ide/${Cloud9Host}"
