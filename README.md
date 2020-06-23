@@ -31,20 +31,21 @@ If you continue to encounter failures after having increased the EIP limit, it's
 1. Clone this repo:
 
 ```
-git clone git@github.com:OzNetNerd/Cloud-One-Container-Image-Security-Demo.git
+git clone https://github.com/OzNetNerd/Cloud-One-Container-Image-Security-Demo.git
 ```
 
 2. Install dependencies:
 
 ```
+cd Cloud-One-Container-Image-Security-Demo
 pip3 install -r requirements.txt --user
 ```
 
 3. Change to the `code` directory, then execute `run.py` using parameters which suit your needs:
 
 ```
-$ cd code
-$ python3 run.py -h
+cd code
+python3 run.py -h
 usage: run.py [-h] -a ACTION -s STACK_NAME -f KEY_FILE [-k KEY_PAIR] [-p PASSWORD] [-u REGISTRY_USERNAME] [-e REGISTRY_PASSWORD] [-n NUMBER_OF_NODES] [-z NUMBER_OF_AZS] [-t NODE_INSTANCE_TYPE] [-i ADMIN_IP]
 
 optional arguments:
