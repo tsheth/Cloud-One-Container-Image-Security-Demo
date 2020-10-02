@@ -14,6 +14,7 @@ kubectl create secret tls dssc-proxy-certificate \
 echo 'Enabling pre-registry scanning'
 helm upgrade \
 --set auth.secretSeed=$DEFAULT_PASSWORD \
+--set auth.password=$DEFAULT_PASSWORD \
 --set registry.enabled=true \
 --set registry.auth.username=$REGISTRY_USERNAME \
 --set registry.auth.password=$REGISTRY_PASSWORD \
