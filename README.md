@@ -31,7 +31,7 @@ If you continue to encounter failures after having increased the EIP limit, it's
 1. Clone this repo:
 
 ```
-git clone https://github.com/OzNetNerd/Cloud-One-Container-Image-Security-Demo.git
+git clone https://github.com/tsheth/Cloud-One-Container-Image-Security-Demo.git
 ```
 
 2. Install dependencies:
