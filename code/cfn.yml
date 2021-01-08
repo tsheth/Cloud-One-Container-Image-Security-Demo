@@ -57,11 +57,11 @@ Parameters:
 
   VpcCidr:
     Type: "String"
-    Default: "10.0.0.0/16"
+    Default: "192.168.0.0/16"
 
   PublicSubnet1Cidr:
     Type: "String"
-    Default: "10.0.0.0/24"
+    Default: "192.168.1.0/24"
 
 Resources:
   Vpc:
